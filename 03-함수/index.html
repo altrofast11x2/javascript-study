@@ -10,16 +10,19 @@
 <body>
     <script src="../lib.js"></script>
     <script>
+        const scores = [95, 88, 72, 100, 61]
         function getGrade(value) {
-            if (value >= 90) {
-                return "A";
-            } else if (value >= 80) {
-                return "B";
-            } else {
-                return "C";
-            }
+            if (value >= 90) return "A";
+            if (value >= 80) return "B";
+            return "C";
         }
-        console.log(getGrade(95));
+        scores.forEach(function (e) {
+            console.log(`${e}점 -> ${getGrade(e)}`)
+        });
+        console.log('====================');
+        for (const score of scores) {
+            console.log(`${score} -> ${getGrade(score)}`);
+        }
     </script>
 </body>
 
