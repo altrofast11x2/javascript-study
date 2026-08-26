@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="../lib.js"></script>
+    <script>
+        const scores = [95, 88, 72, 100, 61, 45, 83]
+        function getGrade(value) {
+            if (value >= 90) return "A";
+            if (value >= 80) return "B";
+            return "C";
+        }
+        //(1) map으로 모든 점수에 5점씩 더한 새 배열 만들기
+        console.log(scores.map(e => e + 5));
+        //(2) filter로 80점 이상만 골라내기
+        console.log(scores.filter(e => e >= 80));
+        //(3) 체이닝으로 — 80점 이상만 골라서 "95점: A" 형태의 문자열 배열 만들기. Day 03의 getGrade 재사용하세요.
+
+        console.log(
+            scores
+                .filter(e => e >= 80)
+                .map(s => `${s}점: ${getGrade(s)}`)
+        );
+        //(4)  find로 첫 번째 불합격(60점 미만) 점수 찾기
+        console.log(scores.find(e=> e < 60));
+        //(5) 원본 scores를 건드리지 않고 내림차순 정렬한 새 배열 만들기. 마지막에 console.log(scores)를 찍어서 원본이 그대로인지 확인하세요.
+        console.log([...scores].sort((a,b)=> b - a));
+        console.log(scores);
+    </script>
+</body>
+
+</html>
