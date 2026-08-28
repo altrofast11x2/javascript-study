@@ -28,10 +28,33 @@
                 .map(s => `${s}점: ${getGrade(s)}`)
         );
         //(4)  find로 첫 번째 불합격(60점 미만) 점수 찾기
-        console.log(scores.find(e=> e < 60));
+        console.log(scores.find(e => e < 60));
         //(5) 원본 scores를 건드리지 않고 내림차순 정렬한 새 배열 만들기. 마지막에 console.log(scores)를 찍어서 원본이 그대로인지 확인하세요.
-        console.log([...scores].sort((a,b)=> b - a));
+        console.log([...scores].sort((a, b) => b - a));
         console.log(scores);
+        // ======== PART 2 ============
+        const users = [
+            { name: "노벨", age: 21, city: "서울", skills: ["JS", "PHP"] },
+            { name: "지민", age: 25, city: "부산", skills: ["Python"] },
+            { name: "현우", age: 19, city: "서울", skills: ["JS", "CSS", "HTML"] },
+            { name: "수아", age: 30, city: "대구", skills: [] }
+        ]
+
+        // (1) 서울에 사는 사람의 이름만 배열로 만들기 → ["노벨", "현우"]
+        console.log(users.filter(e => e.city === "서울"));
+        // (2) 20세 이상인 사람을 "노벨(21) - 서울" 형태의 문자열 배열로 만들기
+        console.log(users.filter(e => e.age >= 20).map((e, i) => `${e.name}(${e.age}) - ${e.city}`));
+        // (3) 구조 분해로 users[2]의 name과 skills를 변수에 꺼내서 출력하기
+        const { name, skills } = users
+        console.log(users[2]);
+        // (4) 원본을 건드리지 말고 "노벨"의 나이만 22로 바꾼 새 배열 만들기.
+        //     마지막에 console.log(users)로 원본이 그대로인지 확인할 것.
+        console.log({ ...users[0], age: 22 });
+        console.log(users);
+        // (5) users를 JSON 문자열로 바꿨다가 다시 객체로 되돌린 뒤,
+        //     배울 게 하나도 없는(skills가 빈) 사람의 이름 출력하기
+        const str = JSON.stringify(users)
+        console.log(JSON.parse(str).filter(e => e.skills.length === 0).map(e => e.name));
     </script>
 </body>
 
