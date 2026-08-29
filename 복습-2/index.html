@@ -54,7 +54,7 @@
   //     힌트: ?. 와 삼항연산자를 같이 씁니다
   console.log(orders.map(e => e.customer?.grade === undefined ? "일반" : e.customer?.grade));
   // Q5. id가 "A3"인 주문 하나 찾기
-  console.log(orders.filter(e => e.id === "A3"));
+  console.log(orders.find(e => e.id === "A3"));
   // Q6. 상품을 많이 산 순서로 정렬해서 id만 배열로 만들기
   //     → ["A3", "A1", "A2", "A4"]  (items가 3개, 2개, 1개, 1개)
   //     원본을 건드리지 말 것. 마지막에 console.log(orders)로 확인할 것
@@ -70,7 +70,7 @@
   console.log(`${id} 주문 - ${customer.name}`);
   // Q9. 결제 안 된 주문에만 status: "미결제" 를 붙인 새 배열 만들기
   //     마지막에 console.log(orders)로 원본이 그대로인지 확인할 것
-  console.log([...orders].filter(e => e.paid === false).map(e => e = { ...e, status: "미결제" }));
+  console.log([...orders].filter(e => e.paid === false).map(e => e ? { ...e, status: "미결제" } : e));
   console.log(orders);
   // Q10. orders[0].customer 를 순회해서 "name: 노벨" 처럼 한 줄씩 출력하기
   console.log(Object.entries((orders[0].customer)).forEach(([k, v]) => console.log(`${k}: ${v}`)));
@@ -81,7 +81,7 @@
   // Q12. (생각해보기) orders 전체를 JSON 문자열로 바꾸고,
   //      그 문자열을 다시 객체로 되돌린 뒤 A2의 고객 이름 출력하기
   const str = JSON.stringify(orders[1])
-  console.log(JSON.parse(str)?.customer?.name);
+  console.log(JSON.parse(str).customer.name);
 </script>
 
 </html>
