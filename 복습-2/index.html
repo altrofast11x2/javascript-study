@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script src="../lib.js"></script>
+<script>
+  // ============ 복습 2 : 중첩된 실전 데이터 ============
+  // PHP의 json_encode가 뿜어줌직한 모양입니다.
+  // customer가 없는 주문(비회원)도 섞여 있음에 주의.
+
+  const orders = [
+    {
+      id: "A1", paid: true,
+      customer: { name: "노벨", grade: "VIP" },
+      items: [{ name: "키보드", price: 89000 }, { name: "마우스", price: 32000 }]
+    },
+    {
+      id: "A2", paid: false,
+      customer: { name: "지민" },
+      items: [{ name: "모니터", price: 245000 }]
+    },
+    {
+      id: "A3", paid: true,
+      items: [{ name: "웹캠", price: 55000 }, { name: "헤드셋", price: 120000 }, { name: "키보드", price: 89000 }]
+    },
+    {
+      id: "A4", paid: false,
+      customer: { name: "수아", grade: "VIP" },
+      items: [{ name: "마우스", price: 32000 }]
+    }
+  ]
+
+  // Q1. 모든 주문의 id만 배열로 만들기
+  //     → ["A1", "A2", "A3", "A4"]
+  console.log(orders.map(e => e.id));
+  // Q2. 결제가 된(paid: true) 주문의 id만 배열로 만들기
+  //     → ["A1", "A3"]
+  console.log(orders.filter(e => e.paid === true).map(e => e.id));
+  // Q3. 각 주문의 고객 이름만 배열로 만들기
+  //     → ["노벨", "지민", undefined, "수아"]
+  //     A3은 customer가 없습니다. 그냥 o.customer.name 으로 쓰면 어떻게 되는지
+  //     먼저 한 번 돌려보고, 그다음에 ?. 를 써서 고치세요.
+  console.log(orders.map(e => e.customer?.name));
+  // Q4. 고객 등급을 배열로 만들되, 등급이 없으면 "일반" 으로 넣기
+  //     → ["VIP", "일반", "일반", "VIP"]
+  //     힌트: ?. 와 삼항연산자를 같이 씁니다
+  console.log(orders.map(e => e.customer?.grade === undefined ? "일반" : e.customer?.grade));
+  // Q5. id가 "A3"인 주문 하나 찾기
+  console.log(orders.filter(e => e.id === "A3"));
+  // Q6. 상품을 많이 산 순서로 정렬해서 id만 배열로 만들기
+  //     → ["A3", "A1", "A2", "A4"]  (items가 3개, 2개, 1개, 1개)
+  //     원본을 건드리지 말 것. 마지막에 console.log(orders)로 확인할 것
+  console.log([...orders].sort((a, b) => b.items.length - a.items.length).map(e => e.id));
+  console.log(orders);
+  // Q7. "키보드"를 주문한 주문의 id만 배열로 만들기
+  //     → ["A1", "A3"]
+  //     힌트: filter 안에서 items를 이름 배열로 바꾸고, 거기에 includes를 씁니다
+  console.log(orders.filter(e => e.items.find(e => e.name.includes("키보드"))).map(e => e.id));
+  // Q8. 구조 분해로 orders[0]에서 id와 customer를 꺼내고,
+  //     그 customer에서 다시 name을 꺼내서 "A1 주문 - 노벨" 형태로 출력하기
+  const { id, customer } = orders[0]
+  console.log(`${id} 주문 - ${customer.name}`);
+  // Q9. 결제 안 된 주문에만 status: "미결제" 를 붙인 새 배열 만들기
+  //     마지막에 console.log(orders)로 원본이 그대로인지 확인할 것
+  console.log([...orders].filter(e => e.paid === false).map(e => e = { ...e, status: "미결제" }));
+  console.log(orders);
+  // Q10. orders[0].customer 를 순회해서 "name: 노벨" 처럼 한 줄씩 출력하기
+  console.log(Object.entries((orders[0].customer)).forEach(([k, v]) => console.log(`${k}: ${v}`)));
+  // Q11. (생각해보기) A1 주문의 상품 이름을 " + " 로 이어붙여
+  //      "키보드 + 마우스" 로 만들기
+  const {items} = orders[0]
+  console.log(items.map(e=>e.name).join(" + "));
+  // Q12. (생각해보기) orders 전체를 JSON 문자열로 바꾸고,
+  //      그 문자열을 다시 객체로 되돌린 뒤 A2의 고객 이름 출력하기
+  const str = JSON.stringify(orders[1])
+  console.log(JSON.parse(str)?.customer?.name);
+</script>
+
+</html>
