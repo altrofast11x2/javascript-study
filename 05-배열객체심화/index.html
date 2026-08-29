@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05 - 배열·객체 심화</title>
+</head>
+
+<body>
+
+</body>
+<script src="../lib.js"></script>
+<script>
+  // ============ 05 : 배열·객체 심화 ============
+  // 직접 생각해서 써보고, 답을 먼저 예측한 뒤 돌리세요.
+
+  const cart = [
+    { name: "키보드", price: 89000, qty: 2, stock: 5 },
+    { name: "마우스", price: 32000, qty: 1, stock: 0 },
+    { name: "모니터", price: 245000, qty: 1, stock: 3 },
+    { name: "웹\ce20", price: 55000, qty: 3, stock: 12 }
+  ]
+
+
+  // ========== PART 1 : reduce ==========
+  // reduce는 배열을 "값 하나"로 접는 메서드입니다.
+  // arr.reduce((누적값, 현재값) => 다음누적값, 초깃값)
+
+  // 1-1. price를 전부 더한 합계를 reduce로 구하기
+  //      먼저 손으로 예측해보세요: 89000+32000+245000+55000 = ?
+
+
+  // 1-2. price * qty 의 총액 구하기 (장바구니 총액)
+
+
+  // 1-3. reduce로 가장 비싼 상품의 이름 찾기
+  //      누적값이 숫자가 아니라 객체일 수도 있습니다
+
+
+  // 1-4. reduce로 이름을 key, price를 value로 하는 객체 만들기
+  //      → { 키보드: 89000, 마우스: 32000, ... }
+  //      초깃값을 {} 로 주고, 매번 { ...누적값, [이름]: 값 } 을 반환
+
+
+  // ========== PART 2 : some / every ==========
+  // some  : 하나라도 조건을 만족하면 true
+  // every : 전부 만족해야 true
+  // 둘 다 true/false 하나만 돌려줍니다 (배열이 아님!)
+
+  // 2-1. 품절된(stock이 0인) 상품이 하나라도 있는가?
+
+
+  // 2-2. 모든 상품이 3만원 이상인가?
+
+
+  // 2-3. 복습-2의 Q7을 some으로 다시 풀기
+  //      orders를 여기에 다시 가져왔습니다
+  const orders = [
+    { id: "A1", items: [{ name: "키보드" }, { name: "마우스" }] },
+    { id: "A2", items: [{ name: "모니터" }] },
+    { id: "A3", items: [{ name: "웹\ce20" }, { name: "헤드셋" }, { name: "키보드" }] }
+  ]
+  // "키보드"를 주문한 id → ["A1", "A3"]
+  // filter 안에서 some을 씁니다
+
+
+  // ========== PART 3 : ?? (널 병합) ==========
+  // A ?? B  →  A가 null 또는 undefined면 B, 아니면 A
+  // ||  와 다릅니다. ||는 0, "", false도 걸러냅니다.
+
+  const users = [
+    { name: "노벨", grade: "VIP", point: 0 },
+    { name: "지민" },
+    { name: "수아", grade: "GOLD", point: 500 }
+  ]
+
+  // 3-1. 등급 배열 만들기, 없으면 "일반"  → ["VIP", "일반", "GOLD"]
+  //      복습-2 Q4를 ?? 로 다시
+
+
+  // 3-2. point 배열 만들기, 없으면 0
+  //      ?? 와 || 를 둘 다 써보고 결과가 왜 다른지 적으세요
+  //      노벨의 point는 0입니다
+
+
+  // ========== PART 4 : 객체 단축 속성 ==========
+  // { name: name } 를 { name } 으로 줄일 수 있습니다.
+
+  const name = "노벨"
+  const age = 21
+
+  // 4-1. 위 두 변수로 { name: "노벨", age: 21 } 만들기 — 단축으로
+
+
+  // 4-2. cart를 map으로 돌려서 { name, total } 모양으로 바꾸기
+  //      total은 price * qty
+  //      → [{ name: "키보드", total: 178000 }, ...]
+
+
+  // ========== PART 5 : 중첩 구조 분해 ==========
+  const order = {
+    id: "A1",
+    customer: { name: "노벨", addr: { city: "서울" } }
+  }
+
+  // 5-1. 한 줄로 id와 customer.name을 꺼내기
+  //      const { id, customer: { name: ??? } } = order
+  //      주의: 위에 name 변수가 이미 있으니 다른 이름으로 받아야 합니다
+
+
+  // 5-2. city까지 3단계로 꺼내기
+
+
+  // 5-3. 기본값 주기 — 없는 키에 기본값을 붙일 수 있습니다
+  //      const { grade = "일반" } = { name: "지민" }
+  //      이걸 직접 써보고 grade를 출력해보세요
+
+
+  // ========== PART 6 : splice ==========
+  // splice(시작위치, 지울개수, 넣을값...)  — 원본을 바꿉니다!
+  // 반환값은 "지워진 요소들의 배열"입니다.
+
+  // 6-1. 이 배열에서 2번 인덱스부터 1개 지우기
+  const fruits = ["사과", "바나나", "포도", "귀율"]
+  //      지우기 전에 결과를 예측해서 주석으로 적어보세요
+  //      splice의 반환값과, splice 후의 fruits를 둘 다 출력하세요
+
+
+  // 6-2. 1번 위치에 "망고"를 아무것도 안 지우고 끼워넣기
+
+
+  // 6-3. slice와 비교 — 같은 배열에 slice(1, 3)을 해보고
+  //      원본이 그대로인지 확인하세요
+
+
+  // ========== PART 7 : Object.fromEntries ==========
+  // Object.entries 의 반대. [[k,v],[k,v]] 를 다시 객체로.
+
+  const prices = { 키보드: 89000, 마우스: 32000, 모니터: 245000 }
+
+  // 7-1. 모든 가격을 10% 올린 새 객체 만들기
+  //      entries → map → fromEntries 순서입니다
+
+
+  // 7-2. 5만원 넘는 것만 남긴 새 객체 만들기
+  //      entries → filter → fromEntries
+
+</script>
+
+</html>
