@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script src="../lib.js"></script>
+<script>
+  // ================== 복습 1 : 배열 + 객체 ==================
+  const products = [
+    { id: 1, name: "키보드", price: 89000, stock: 3, tags: ["입력", "사무"] },
+    { id: 2, name: "마우스", price: 32000, stock: 0, tags: ["입력"] },
+    { id: 3, name: "모니터", price: 245000, stock: 7, tags: ["출력", "사무"] },
+    { id: 4, name: "웹캠", price: 55000, stock: 0, tags: ["영상"] },
+    { id: 5, name: "헤드셋", price: 120000, stock: 2, tags: ["영상", "음향"] }
+  ]
+
+  // Q1. 상품 이름만 뽑아서 배열로 만들기
+  //     → ["키보드", "마우스", "모니터", "웹캠", "헤드셋"]
+  console.log(products.map(e => e.name));
+  // Q2. 재고가 있는(stock > 0) 상품의 이름만 배열로 만들기
+  //     → ["키보드", "모니터", "헤드셋"]
+  console.log(products.filter(e => e.stock > 0).map(e => e.name));
+  // Q3. 10만원 이상인 상품을 "모니터: 245000원" 형태의 문자열 배열로 만들기
+  console.log(products.filter(e => e.price > 100000).map(e => `${e.name}: ${e.price}원`));
+  // Q4. id가 3인 상품 하나 찾기
+  //     찍어보고, 결과가 배열인지 객체인지 눈으로 확인할 것
+  console.log(products.find(e => e.id === 3));
+  // Q5. 원본을 건드리지 말고 가격이 싼 순으로 정렬해서 이름만 배열로 만들기
+  //     마지막에 console.log(products)로 원본이 그대로인지 확인할 것
+  console.log([...products].sort((a, b) => a.price - b.price).map(e => e.name));
+  console.log(products)
+  // Q6. tags에 "사무"가 들어간 상품의 이름만 배열로 만들기
+  //     → ["키보드", "모니터"]
+  //     힌트: filter 안에서 배열 메서드를 한 번 더 씁니다
+  console.log(products.filter(e => e.tags.includes("사무")).map(e => e.name))
+  // Q7. 모든 상품 이름을 " / " 로 이어 붙여 문자열 하나로 만들기
+  //     → "키보드 / 마우스 / 모니터 / 웹캠 / 헤드셋"
+  console.log(products.map(e => e.name).join(' / '))
+  // Q8. 구조 분해로 products[4]의 name과 price를 꺼내서
+  //     "헤드셋은 120000원" 형태로 출력하기
+  const { name, price } = products[4]
+  console.log(`${name}은 ${price}원`);
+  // Q9. 재고가 0인 상품에만 soldOut: true 를 붙인 새 배열 만들기
+  //     (재고가 있는 상품은 그대로 두기)
+  //     마지막에 console.log(products)로 원본이 그대로인지 확인할 것
+  console.log(products.map(e => e.stock === 0 ? { ...e, soldOut: true } : e));
+  console.log(products);
+  // Q10. products[0]을 순회해서 "id: 1" 처럼 한 줄씩 출력하기
+  //      → id: 1 / name: 키보드 / price: 89000 ... 이 순서로 5줄
+  Object.entries(products[0]).forEach(([k, v]) => console.log(`${k}: ${v}`))
+</script>
+
+</html>
