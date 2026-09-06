@@ -138,25 +138,27 @@
     Object.entries(prices).filter(([k, v]) => v > 50000)
   )
   console.log(expensive);
-
   // 7-3. 키와 값을 서로 바꾼 객체 만들기
   //      { 키보드: 89000 }  ->  { 89000: "키보드" }
-  //      map 안에서 짝의 순서만 뒤집으면 됩니다
-
-
+  const change = Object.fromEntries(
+    Object.entries(prices).map(([k, v]) => [v, k])
+  )
+  console.log(change);
   // 7-4. filter 와 map 을 이어붙이기
   //      5만원 넘는 것만 남기고, 그것들만 20% 할인한 객체 만들기
   //      Object.entries(...).filter(...).map(...) 처럼 점을 계속 이어도 됩니다
   //      소수점이 지저분하면 Math.round 로 감싸보세요
-
-
+  const filterd = Object.fromEntries(
+    Object.entries(prices).filter(([k, v]) => v > 50000).map(([k, v]) => [k, v * 0.8])
+  )
+  console.log(filterd);
   // 7-5. fromEntries 는 entries 결과가 아니어도 받습니다
   //      [키, 값] 짝 배열이기만 하면 됩니다.
   //      맨 위 cart 배열로  { 키보드: 5, 마우스: 12, ... } 처럼
   //      "이름: 재고" 객체를 만들어보세요  (cart -> map -> fromEntries)
   //      1-4 를 reduce 로 풀었던 것과 같은 결과입니다. 어느 쪽이 짧은지 비교해보세요
-
-
+  const stocks = Object.fromEntries(cart.map(e => [e.name, e.stock]))
+  console.log(stocks);
 </script>
 
 </html>
