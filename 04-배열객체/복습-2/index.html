@@ -52,7 +52,7 @@
   // Q4. 고객 등급을 배열로 만들되, 등급이 없으면 "일반" 으로 넣기
   //     → ["VIP", "일반", "일반", "VIP"]
   //     힌트: ?. 와 삼항연산자를 같이 씁니다
-  console.log(orders.map(e => e.customer?.grade === undefined ? "일반" : e.customer?.grade));
+  console.log(orders.map(e => e.customer?.grade ?? "일반"));
   // Q5. id가 "A3"인 주문 하나 찾기
   console.log(orders.find(e => e.id === "A3"));
   // Q6. 상품을 많이 산 순서로 정렬해서 id만 배열로 만들기
@@ -73,7 +73,7 @@
   console.log([...orders].filter(e => e.paid === false).map(e => e ? { ...e, status: "미결제" } : e));
   console.log(orders);
   // Q10. orders[0].customer 를 순회해서 "name: 노벨" 처럼 한 줄씩 출력하기
-  console.log(Object.entries((orders[0].customer)).forEach(([k, v]) => console.log(`${k}: ${v}`)));
+  Object.entries(orders[0].customer).forEach(([k, v]) => console.log(`${k}: ${v}`))
   // Q11. (생각해보기) A1 주문의 상품 이름을 " + " 로 이어붙여
   //      "키보드 + 마우스" 로 만들기
   const {items} = orders[0]
