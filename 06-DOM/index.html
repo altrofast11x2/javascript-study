@@ -6,11 +6,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    .hi   { background: yellow; color: #222; }
-    .hide { display: none; }
-    .red  { color: tomato; }
-    #box  { width: 100px; height: 100px; border: 1px solid #fff; }
-    .card { border: 1px solid #888; padding: 10px; margin: 10px 0; }
+    .hi {
+      background: yellow;
+      color: #222;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .red {
+      color: tomato;
+    }
+
+    #box {
+      width: 100px;
+      height: 100px;
+      border: 1px solid #fff;
+    }
+
+    .card {
+      border: 1px solid #888;
+      padding: 10px;
+      margin: 10px 0;
+    }
   </style>
 </head>
 
@@ -56,96 +75,111 @@
     // ========== PART 1 : $ — 하나 찾기 ==========
 
     // 1-1. #title 을 $ 로 잡아서 찍어보세요
+    console.log($("#title"));
 
 
     // 1-2. $(".desc") 와 $$(".desc") 를 둘 다 찍어보세요.
     //      뭐가 다른지 주석으로 한 줄 적으세요
-
+    console.log($(".desc"), $$(".desc"));
+    //다른 이유: lib.js 에 $는 그냥 선택하는거고 $$는 배열로 여러게를 선택해서 임.
 
     // 1-3. 아래 세 개를 각각 찍어보고, 화면의 무엇이 잡혔는지 주석으로 적으세요
     //      $("p.desc")   /   $("[data-name]")   /   $("#menu li:last-child")
-
+    console.log($("p.desc"), $("[data-name]"), $("#menu li:last-child"));
+    // p.desc 의 첫번째 자식 / [data-name] 의 속성을 가진것 첫번째 인식되는거, #menu 안에 마지막 자식 요소들이 찍힘
 
     // 1-4. $("#없는거") 를 찍어보세요. 뭐가 나오나요?
     //      그 다음 ?. 를 써서 textContent 를 읽어보세요 (undefined 가 나와야 함)
     //      ?. 없이 .textContent 를 붙이면 어떻게 되는지도 한 번 해보고 -> 에러 적고 -> 주석 처리
-
+    console.log($("#hi")); //null
+    console.log($("#hi"))?.textContent; //null
+    // console.log($("#hi")).textContent; //Uncaught TypeError: Cannot read properties of undefined (reading 'textContent')
 
     // ========== PART 2 : $$ — 전부 찾기 ==========
 
     // 2-1. .desc 가 몇 개인지 출력하세요
-
+    console.log($$(".desc").length);
 
     // 2-2. ⭐ 일부러 터뜨리기
     //      document.querySelectorAll(".desc").map(p => p.textContent)  를 찍어보세요
     //      에러 메시지를 아래 주석에 그대로 옮겨 적고, 그 줄은 주석 처리하세요
-    //      에러:
-
+    //      에러: Uncaught TypeError: document.querySelectorAll(...).map is not a function
+    // console.log(document.querySelectorAll(".desc").map(p => p.textContent));
 
     // 2-3. 같은 걸 $$ 로 해보세요.  -> ["첫 번째 문단", "두 번째 문단", "세 번째 문단"]
     //      lib.js 의 $$ 에 왜 [...] 가 있는지 주석으로 한 줄 적으세요
-
+    console.log($$(".desc"));
+    //[...]가 왜 있나면 이 배열을 forEach 나 map 등등을 하기 위해 만들었습니다. 즉 그냥 내가 편하기 위해 만들었다.
 
     // 2-4. $$(".desc").textContent = "야호"  를 해보세요.
     //      화면이 바뀌나요? 에러가 나나요? 왜 그런지 주석으로 적으세요
-
+    $$(".desc").textContent = "야호";
+    //안바뀌는 이유는 [...] 즉 배열로 감싸놨는데 밖에서 .textContent를 적용시킨거라 즉 코드는 [...document.querySelectorAll('.desc')].textContent = '야호' 그냥 무시됨.
 
     // 2-5. 2-4 를 제대로 — forEach 로 세 문단 전부에 "red" 클래스를 붙이세요
-
+    $$(".desc").forEach(e => {
+      e.textContent = "야호",
+        e.classList.add("red")
+    });
 
     // ========== PART 3 : 안에서 찾기 ==========
 
     // 3-1. $(".price") 를 찍어보세요. 카드가 두 개인데 어느 카드의 가격이 잡혔나요?
-
+    console.log($(".price"));
+    // 당연히 페이지에서 처음 읽힌 89000 이 잡혔습니다.
 
     // 3-2. #card2 를 잡은 다음, 그 요소에 querySelector 를 붙여서 #card2 안의 .price 만 찾으세요
     //      -> <p class="price">32000</p>
-
+    console.log($("#card2").querySelector(".price"));
 
     // 3-3. $(".price", $("#card2")) 를 찍어보고 3-2 와 결과를 비교하세요.
     //      왜 다른지 lib.js 를 보고 주석으로 적으세요.
     //      덤: 선언한 적 없는 card2 를 그냥 console.log(card2) 해보세요. 왜 될까요?
-
+    console.log($(".price", $("#card2"))); //왜 결과가 다르냐면 우선 .price 를 select 해서 먼저 선택된 자식이 출력된겁니다.
+    console.log(card2) //되는이유: windows 에서는 id 를 자동으로 인식하기 때문에 됩니다.
 
     // ========== PART 4 : 글자 읽고 쓰기 ==========
 
     // 4-1. #title 의 글자를 읽어서 찍고, "DOM 정복" 으로 바꾸세요
-
+    $("#title").textContent = "DOM 정복"
 
     // 4-2. 첫 번째 .desc 에는 textContent 로, 두 번째 .desc 에는 innerHTML 로
     //      똑같이 "<b>굵게</b>" 를 넣으세요. 화면에서 뭐가 다른지 주석으로 적으세요
-
+    $$(".desc")[0].textContent = "<b>굵게</b>"
+    $$(".desc")[1].innerHTML = "<b>굵게</b>"
+    // 다른점: innerHTML = 진짜 HTML 요소, textContent 은 그냥 text 요소
 
     // 4-3. 카드 두 개의 .name 글자를 $$ + map 으로 뽑으세요.  -> ["키보드", "마우스"]
-
+    console.log($$(".card").map(e => e.querySelector(".name")));
 
     // ========== PART 5 : 속성과 dataset ==========
-
     // 5-1. #link 의 .href 와 getAttribute("href") 를 둘 다 찍어서 비교하세요
-
+    console.log($("#link").href); // 누르면 href 되는 전체 링크를 보여줌
+    console.log($("#link").getAttribute("href")); // 그냥 텍스트로 href 되면 넘어갈 폴더를 보여줌 
 
     // 5-2. #nick 의 .value 와 getAttribute("value") 를 둘 다 찍으세요.
     //      그 다음 화면의 입력칸에 아무 글자나 직접 타이핑하고,
     //      콘솔에 $("#nick").value 와 $("#nick").getAttribute("value") 를 직접 쳐서 비교하세요
-
+    console.log(nick.value); //바뀐 nick.value 를 보여주고 
+    console.log(nick.getAttribute("value")); //처음 에 적혀있던 처음값이 그대로 계속 출력됨.
 
     // 5-3. #box 의 dataset 에서 name 과 price 를 꺼내고, price 의 typeof 도 같이 찍으세요
     //      -> 상자 5000 string
-
+    console.log(box.dataset.name, box.dataset.price, typeof (box.dataset.price));
 
     // 5-4. price + 1000 과 Number(price) + 1000 을 둘 다 찍으세요
     //      -> 50001000
     //      -> 6000
-
+    console.log(box.dataset.price + 1000, Number(box.dataset.price) + 1000);
 
     // 5-5. data-user-name 을 dataset 으로 읽으세요. (키 이름이 어떻게 바뀌는지 주의)
-
+    console.log(box.dataset.userName); //처음 data 는 무시하고 userName 으로 읽음
 
     // 5-6. 카드 두 개의 가격을 $$ + map 으로 "숫자" 배열로 만들고, reduce 로 합계를 구하세요
     //      -> [89000, 32000]
     //      -> 121000
     //      (Number 를 빼먹으면 합계가 어떻게 나오는지도 한 번 보세요)
-
+    console.log($$(".card").map(e => Number(e.querySelector(".price"))).reduce((acc, cur) => acc.price + cur.price, 0));
 
     // ========== PART 6 : classList ==========
 
