@@ -32,11 +32,8 @@
   // 1-2. price * qty 의 총액 구하기 (장바구니 총액)
   console.log(cart.reduce((acc, cur) => acc + cur.price * cur.qty, 0));
   // 1-3. reduce로 가장 비싼 상품의 이름 찾기
-  console.log(cart.reduce((acc, cur) => {
-    return acc.price > cur.price ? acc.name : cur
-  }, {}));
+  console.log(cart.reduce((acc, cur) => cur.price > acc.price ? cur.name : acc))
   // 1-4. reduce로 이름을 key, price를 value로 하는 객체 만들기
-  const key = ["name"], price = ["price"]
   console.log(cart.reduce((acc, cur) => {
     return { ...acc, [cur.name]: cur.price }
   }, {}));
@@ -48,7 +45,7 @@
   // 2-1. 품절된(stock이 0인) 상품이 하나라도 있는가?
   console.log(cart.some(e => e.stock === 0));
   // 2-2. 모든 상품이 3만원 이상인가?
-  console.log(cart.some(e => e.price > 30000));
+  console.log(cart.every(e => e.price >= 30000));
   // 2-3. 복습-2의 Q7을 some으로 다시 풀기
   //      orders를 여기에 다시 가져왔습니다
   const orders = [
