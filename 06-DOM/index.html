@@ -90,7 +90,7 @@
     // 1-4. $("#없는거") 를 찍어보세요. 뭐가 나오나요?
     //      그 다음 ?. 를 써서 textContent 를 읽어보세요 (undefined 가 나와야 함)
     //      ?. 없이 .textContent 를 붙이면 어떻게 되는지도 한 번 해보고 -> 에러 적고 -> 주석 처리
-    console.log($("#hi")); //null
+    console.log($("#hi")); //undefined
     console.log($("#hi")?.textContent); //null
     // console.log($("#hi")).textContent; //Uncaught TypeError: Cannot read properties of undefined (reading 'textContent')
 
@@ -197,7 +197,7 @@
     console.log(desc.classList.contains("hide"));
 
     // 6-3. #menu 안의 .now 를 찾아서 "hi" 를 붙이세요
-    console.log($("#menu").querySelector(".now").classList.add("hi"));
+    $("#menu").querySelector(".now").classList.add("hi")
 
     // 6-4. #card1 에는 className = "hi" 로, #card2 에는 classList.add("hi") 로 해보세요.
     //      화면에서 두 카드의 테두리를 보고, 뭐가 달라졌는지 주석으로 적으세요
