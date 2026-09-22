@@ -32,7 +32,7 @@
   // 1-2. price * qty 의 총액 구하기 (장바구니 총액)
   console.log(cart.reduce((acc, cur) => acc + cur.price * cur.qty, 0));
   // 1-3. reduce로 가장 비싼 상품의 이름 찾기
-  console.log(cart.reduce((acc, cur) => cur.price > acc.price ? cur.name : acc))
+  console.log(cart.reduce((acc, cur) => cur.price > acc.price ? cur : acc).name)
   // 1-4. reduce로 이름을 key, price를 value로 하는 객체 만들기
   console.log(cart.reduce((acc, cur) => {
     return { ...acc, [cur.name]: cur.price }
