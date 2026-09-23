@@ -5,15 +5,335 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>07 - 이벤트</title>
+  <style>
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      line-height: 1.7;
+    }
+
+    h2 {
+      margin-top: 32px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 4px;
+    }
+
+    .hi {
+      background: yellow;
+      color: #222;
+    }
+
+    .red {
+      color: tomato;
+    }
+
+    .done {
+      text-decoration: line-through;
+      opacity: .5;
+    }
+
+    .card {
+      border: 1px solid #888;
+      padding: 10px;
+      margin: 8px 0;
+    }
+
+    #outer {
+      padding: 20px;
+      border: 1px solid #c00;
+    }
+
+    #middle {
+      padding: 20px;
+      border: 1px solid #0c0;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-</body>
-<script src="../lib.js"></script>
-<script>
-  // ============ 07 - 이벤트 ============
+  <h2>PART 1~4 : 기본 / 이벤트 객체</h2>
+  <button id="btn1">눌러보기</button>
+  <button id="btn2">카운터</button>
+  <span id="count">0</span>
 
-</script>
+  <h2>PART 5 : 여러 개에 붙이기 + closest</h2>
+  <div class="card" id="card1">
+    <h3 class="name">키보드</h3>
+    <p class="price">89000</p>
+    <button class="buy">구매</button>
+  </div>
+  <div class="card" id="card2">
+    <h3 class="name">마우스</h3>
+    <p class="price">32000</p>
+    <button class="buy">구매</button>
+  </div>
+  <div class="card" id="card3">
+    <h3 class="name">모니터</h3>
+    <p class="price">245000</p>
+    <button class="buy">구매</button>
+  </div>
+  <p>장바구니: <span id="cartOut">비어있음</span></p>
+
+  <h2>PART 6 : 버블링</h2>
+  <div id="outer">outer
+    <div id="middle">middle
+      <button id="inner">inner</button>
+    </div>
+  </div>
+
+  <h2>PART 8 : preventDefault</h2>
+  <a id="link" href="https://example.com">example.com 으로 이동</a>
+  <form id="joinForm">
+    <input type="text" id="nickInput" placeholder="닉네임">
+    <input type="number" id="ageInput" placeholder="나이">
+    <button type="submit">가입</button>
+  </form>
+  <p id="formOut"></p>
+
+  <h2>PART 9 : 여러 이벤트</h2>
+  <input type="text" id="live" placeholder="입력해보세요">
+  <p id="liveOut">0 글자</p>
+  <select id="sort">
+    <option value="name">이름순</option>
+    <option value="price">가격순</option>
+  </select>
+  <label><input type="checkbox" id="agree"> 동의</label>
+
+  <h2>PART 10~11 : nl + 위임</h2>
+  <input type="text" id="todoInput" placeholder="할 일">
+  <button id="todoAdd">추가</button>
+  <ul id="todoList">
+    <li>자바스크립트 공부 <button class="del">삭제</button></li>
+    <li>PHP 연동 준비 <button class="del">삭제</button></li>
+  </ul>
+
+  <script src="../lib.js"></script>
+  <script>
+    // ============ 07 : 이벤트 ============
+    // 정리.md 를 먼저 읽고 푸세요. 브라우저로 열고 F12 -> Console 에서 확인합니다.
+    //
+    // ⚠️ 이번 Day 는 "콘솔에 안 찍히는" 문제가 많습니다.
+    //    에러가 안 나는데 반응이 없으면 -> 핸들러를 잘못 넘겼거나, 요소를 못 잡은 겁니다.
+
+
+    // ========== PART 1 : addEventListener 기본 ==========
+
+    // 1-1. #btn1 을 누르면 콘솔에 "눌렸다" 가 찍히게 하세요
+    btn1.addEventListener("click", () => console.log("눌렸다"))
+
+    // 1-2. ⭐ 일부러 틀려보기
+    //      const hello = () => console.log("안녕")  을 만들고
+    //      #btn1 에 addEventListener("click", hello())  로 등록해보세요
+    //      → 페이지를 열자마자 뭐가 일어나나요? 버튼을 누르면요?
+    //      관찰한 걸 주석으로 적고, 괄호를 떼서 제대로 고치세요
+    const hello = () => console.log("안녕");
+    btn1.addEventListener("click", hello()) //바로 실행되면서 "안녕" 이 출력됨
+    btn1.addEventListener("click", () => hello()) //바로 실행되면서 "안녕" 이 출력됨
+
+    // 1-3. #btn1 에 리스너를 두 개 더 붙이세요 (각각 "A", "B" 를 찍게)
+    //      한 번 누르면 몇 개가 찍히나요?
+    btn1.addEventListener('click', () => console.log("A"))
+    btn1.addEventListener('click', () => console.log("B"))
+    //두개가 찍힘
+
+    // 1-4. ⭐ onclick 과 비교
+    //      #btn2 에 onclick 으로 "X" 를 찍게 하고,
+    //      바로 다음 줄에 또 onclick 으로 "Y" 를 찍게 하세요
+    //      → 눌렀을 때 뭐가 찍히나요? 1-3 과 뭐가 다른지 주석으로 적으세요
+    //      (확인했으면 이 두 줄은 주석 처리하세요. 아래 문제와 겹칩니다)
+    btn2.onclick = () => console.log("X");
+    btn2.onclick = () => console.log("Y");
+    //다른점: addEventListener() 는 둘다 되는데 onclick="" 는 하나만 됩니다.
+
+    // ========== PART 2 : 카운터 만들기 ==========
+    // 리스너 안에서 화면을 바꾸는 첫 연습입니다.
+
+    // 2-1. #btn2 를 누를 때마다 #count 의 숫자가 1씩 올라가게 하세요
+    //      힌트: textContent 는 항상 문자열입니다 (Day 06 의 dataset 과 같은 함정)
+    //      Number 를 빼먹으면 어떻게 되는지 한 번 보고 주석으로 적으세요
+    btn2.addEventListener('click', () => {
+      count.textContent = Number(count.textContent) + 1
+      // count.textContent ++ 힝.. 이렇게도 되는뎅 ㅠㅠㅠㅠㅠㅠ
+    })
+
+    // 2-2. 카운트가 5 이상이면 #count 에 "red" 클래스를 붙이세요
+    btn2.addEventListener('click', () => {
+      Number(count.textContent) >= 5 ? count.classList.add('red') : ""
+    })
+
+    // ========== PART 3 : 이벤트 객체 ==========
+
+    // 3-1. #btn1 의 핸들러에서 e 를 통째로 찍어보세요
+    //      그 다음 e.type 과 e.target 을 각각 찍으세요
+    btn1.addEventListener('click', e => {
+      console.log(e.type);
+      console.log(e.target);
+      console.log(e.currentTarget);
+    })
+
+    // 3-2. ⭐ target 과 currentTarget
+    //      #card1 (div 전체) 에 click 리스너를 붙이고, 둘 다 찍으세요
+    //      그 다음 브라우저에서 세 군데를 각각 눌러보세요:
+    //        (1) "키보드" 글자    (2) "89000"    (3) 구매 버튼
+    //      각각 target 이 뭐였는지 주석으로 적으세요. currentTarget 은요?
+
+
+    // ========== PART 4 : this 함정 ==========
+
+    // 4-1. #btn1 에 function () {...} 로 리스너를 붙이고 this 를 찍으세요
+
+
+    // 4-2. 같은 걸 화살표 함수로 붙이고 this 를 찍으세요
+    //      두 결과가 왜 다른지 주석으로 적으세요
+
+
+    // 4-3. 4-1 과 4-2 를 e.currentTarget 으로 통일하세요
+    //      → 둘 다 같은 게 나와야 합니다
+
+
+    // ========== PART 5 : 여러 개에 붙이기 + closest ==========
+
+    // 5-1. ⭐ 일부러 터뜨리기
+    //      $$(".buy").addEventListener("click", ...) 를 해보세요
+    //      에러를 주석에 적고 그 줄은 주석 처리하세요
+    //      에러:
+
+
+    // 5-2. 구매 버튼 3개 전부에 리스너를 붙여서, 누르면 "눌림" 이 찍히게 하세요
+    //      ($$ + forEach)
+
+
+    // 5-3. ⭐ 누른 버튼의 상품 이름을 찍으세요  -> "마우스 담김"
+    //      힌트: e.currentTarget.closest(".card") 로 카드를 찾고, 그 안에서 .name
+
+
+    // 5-4. 5-3 을 확장 — 누른 상품 이름을 #cartOut 에 쌓아서 보여주세요
+    //      -> "키보드, 마우스"  처럼
+    //      힌트: 배열을 하나 만들어두고 push 한 다음 join(", ")
+
+
+    // 5-5. 누른 카드에 "hi" 클래스를 붙이세요 (버튼 말고 카드 전체가 노래져야 함)
+
+
+    // ========== PART 6 : 버블링 ==========
+
+    // 6-1. #outer, #middle, #inner 세 개에 각각 click 리스너를 붙여서
+    //      자기 이름을 찍게 하세요
+    //      그 다음 inner 버튼을 누르고, 찍힌 순서를 주석으로 적으세요
+
+
+    // 6-2. middle 을 눌렀을 때는 뭐가 찍히나요? outer 는요?
+
+
+    // 6-3. #inner 에 e.stopPropagation() 을 추가하고 다시 눌러보세요
+    //      뭐가 달라졌는지 주석으로 적으세요
+
+
+    // ========== PART 7 : 이벤트 위임 ==========
+    // 6-3 의 stopPropagation 은 주석 처리하고 오세요. 안 그러면 헷갈립니다.
+
+    // 7-1. #todoList 에 click 리스너를 딱 하나만 붙여서,
+    //      삭제 버튼을 누르면 그 li 가 사라지게 하세요
+    //      힌트: e.target.closest(".del") 로 받고, 없으면 return
+
+
+    // 7-2. ⭐ 확인
+    //      콘솔에 직접 이걸 쳐서 li 를 하나 추가해보세요
+    //        todoList.append(nl("li", { innerHTML: '새 할 일 <button class="del">삭제</button>' }))
+    //      새로 생긴 삭제 버튼도 동작하나요? 왜 그런지 주석으로 적으세요
+
+
+    // 7-3. 같은 리스너 안에서, 할 일 "글자" 부분을 누르면
+    //      그 li 에 "done" 클래스가 toggle 되게 하세요
+    //      (삭제 버튼을 눌렀을 때는 done 이 붙으면 안 됩니다 — 순서를 생각하세요)
+
+
+    // ========== PART 8 : preventDefault ==========
+
+    // 8-1. #link 를 눌러보세요. 페이지가 어디로 갑니까?
+    //      (뒤로가기로 돌아오세요)
+    //      이동을 막고 대신 "막았다" 가 찍히게 하세요
+
+
+    // 8-2. ⭐ 일부러 틀려보기
+    //      #joinForm 에 submit 리스너를 붙이되, preventDefault 는 아직 쓰지 마세요
+    //      닉네임을 입력하고 가입을 눌러보세요.
+    //      콘솔에 뭐가 보이나요? 주소창은 어떻게 바뀌었나요? 주석으로 적으세요
+
+
+    // 8-3. preventDefault 를 추가하고 다시 해보세요
+    //      닉네임과 나이를 읽어서 #formOut 에 "노벨(21) 가입됨" 처럼 출력하세요
+
+
+    // 8-4. 닉네임이 비어있으면 "닉네임을 입력하세요" 를 #formOut 에 띄우고
+    //      아무 일도 안 일어나게 하세요 (early return)
+
+
+    // 8-5. 입력칸에 커서를 두고 엔터를 쳐보세요. submit 이 잡히나요?
+    //      (이게 click 이 아니라 submit 을 쓰는 이유입니다)
+
+
+    // ========== PART 9 : input / change / keydown ==========
+
+    // 9-1. #live 에 input 리스너를 붙여서, 칠 때마다 #liveOut 에
+    //      "N 글자" 를 보여주세요
+
+
+    // 9-2. 같은 #live 에 change 리스너도 붙이고 값을 찍게 하세요
+    //      "abc" 를 치고 다른 데를 클릭해보세요.
+    //      input 은 몇 번, change 는 몇 번 찍혔나요? 주석으로 적으세요
+
+
+    // 9-3. #sort 에 change 를 붙여서 선택된 값을 찍으세요  -> "name" / "price"
+
+
+    // 9-4. #agree 에 change 를 붙여서 e.target.checked 와 e.target.value 를 둘 다 찍으세요
+    //      왜 value 를 쓰면 안 되는지 주석으로 적으세요
+
+
+    // 9-5. #todoInput 에서 엔터를 치면 "엔터!" 가 찍히게 하세요
+    //      (e.key 사용. 다른 키는 무시)
+
+
+    // ========== PART 10 : nl 로 만들어 붙이기 ==========
+
+    // 10-1. nl 로 <li>테스트</li> 를 만들어서 #todoList 맨 뒤에 붙이세요
+
+
+    // 10-2. 10-1 을 prepend 로 바꿔서 맨 앞에 붙이세요
+
+
+    // 10-3. nl 로 li 를 만들되, 안에 삭제 버튼까지 들어가게 하세요
+    //       힌트: innerHTML 을 속성으로 넘길 수 있습니다
+
+
+    // ========== PART 11 : 종합 — 할 일 목록 ==========
+
+    // 11-1. #todoAdd 를 누르면 #todoInput 의 값으로 li 를 만들어 추가하세요
+    //       - 삭제 버튼도 같이 들어가야 합니다
+    //       - 추가한 뒤에는 입력칸을 비우세요
+    //       - 빈 값이면 추가하지 마세요 (trim 사용)
+
+
+    // 11-2. 11-1 을 엔터로도 되게 하세요 (9-5 와 합치기)
+    //       힌트: 추가하는 부분을 함수로 빼면 두 군데서 부를 수 있습니다
+
+
+    // 11-3. 추가한 항목도 삭제(7-1)와 완료 토글(7-3)이 되는지 확인하세요
+    //       안 되면 위임이 아니라 개별 등록을 한 겁니다
+
+
+    // 11-4. 할 일이 몇 개 남았는지 세는 함수를 만들고,
+    //       추가·삭제·토글 때마다 갱신해서 어딘가에 보여주세요
+    //       힌트: $$("#todoList li").filter(...) — Day 05·06 이 여기서 다시 쓰입니다
+
+  </script>
+</body>
 
 </html>
