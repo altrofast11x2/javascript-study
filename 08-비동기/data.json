@@ -1,0 +1,9 @@
+{
+  "products": [
+    { "id": 1, "name": "키보드", "price": 89000, "stock": 5,  "tags": ["입력", "사무"] },
+    { "id": 2, "name": "마우스", "price": 32000, "stock": 0,  "tags": ["입력"] },
+    { "id": 3, "name": "모니터", "price": 245000, "stock": 3, "tags": ["출력", "사무"] },
+    { "id": 4, "name": "웹캠",   "price": 55000, "stock": 12, "tags": ["영상"] },
+    { "id": 5, "name": "헤드셋", "price": 120000, "stock": 2, "tags": ["영상", "음향"] }
+  ]
+}
