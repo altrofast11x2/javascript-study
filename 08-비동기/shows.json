@@ -1,0 +1,9 @@
+{
+  "shows": [
+    { "id": 1, "title": "햄릿",       "price": 45000, "seats": 12, "hall": "대극장" },
+    { "id": 2, "title": "라이온킹",   "price": 88000, "seats": 0,  "hall": "대극장" },
+    { "id": 3, "title": "재즈의 밤",  "price": 32000, "seats": 40, "hall": "소극장" },
+    { "id": 4, "title": "호두까기인형", "price": 66000, "seats": 0, "hall": "대극장" },
+    { "id": 5, "title": "단편극 모음", "price": 18000, "seats": 7,  "hall": "소극장" }
+  ]
+}
