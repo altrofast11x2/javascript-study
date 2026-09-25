@@ -139,7 +139,7 @@
       }
     })
     goLuck.addEventListener('click', () => {
-      chance().then(r => stage.textContent = r).catch(r => stage.textContent = r)
+      chance().then(r => stage.textContent = r).catch(err => stage.textContent = err)
     })
 
     // ========== PART 3 : async / await ==========
@@ -150,19 +150,20 @@
       const res = await chance()
       return res
     }
-    
-    
+    goChain.addEventListener('click', () => {
+      chance1().then(r => stage.textContent = r).catch(err => stage.textContent = err)
+    })
+
     // 3-2. ⭐ async 를 빼고 await 만 써보세요
-    //      에러:
+    //      에러: Uncaught SyntaxError: await is only valid in async functions and the top level bodies of modules
     //      확인했으면 되돌리세요
 
-
     // 3-3. ⭐ 예상 먼저
-    //        const f = async () => 7
-    //        console.log(f())
-    //        console.log(f() + 1)
-    //      예상:
-    //      이유:
+    //      const f = async () => 7
+    //      console.log(f())
+    //      console.log(f() + 1)
+    //      예상: 잘 모르겠음 ;-; 굳이 예측을 해보자면 Promise 요소가 fulfilled 된거?
+    //      이유: 잘 모르겠음 ;-;
 
 
     // ========== PART 4 : try / catch ==========
