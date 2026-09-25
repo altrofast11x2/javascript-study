@@ -6,14 +6,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>08 - 비동기</title>
   <style>
-    body { background: #222; color: #fff; font-family: sans-serif; line-height: 1.7; padding: 16px; }
-    h2 { margin-top: 28px; border-bottom: 1px solid #555; padding-bottom: 4px; }
-    .ticket { border: 1px solid #888; padding: 10px; margin: 8px 0; }
-    .full { opacity: .4; text-decoration: line-through; }
-    .hot { color: gold; }
-    .fail { color: tomato; }
-    #spin { color: #8cf; }
-    button, input, select { cursor: pointer; }
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      line-height: 1.7;
+      padding: 16px;
+    }
+
+    h2 {
+      margin-top: 28px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 4px;
+    }
+
+    .ticket {
+      border: 1px solid #888;
+      padding: 10px;
+      margin: 8px 0;
+    }
+
+    .full {
+      opacity: .4;
+      text-decoration: line-through;
+    }
+
+    .hot {
+      color: gold;
+    }
+
+    .fail {
+      color: tomato;
+    }
+
+    #spin {
+      color: #8cf;
+    }
+
+    button,
+    input,
+    select {
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -54,49 +88,70 @@
     // ========== PART 1 : 실행 순서 ==========
 
     // 1-1. ⭐ 예상 먼저 — 네 줄이 찍히는 순서를 적고 나서 실행하세요
-    //        setTimeout(() => console.log("A"), 100)
-    //        console.log("B")
-    //        setTimeout(() => console.log("C"), 0)
-    //        console.log("D")
-    //      예상:
-    //      실제:
+    setTimeout(() => console.log("A"), 100)
+    console.log("B")
+    setTimeout(() => console.log("C"), 0)
+    console.log("D")
+    //      예상:B,D,C,A
+    //      실제:B,D,C,A
 
 
     // 1-2. #goSlow 를 누르면 #stage 가 이렇게 바뀌게 하세요
     //        누른 즉시   -> "준비..."
     //        2초 뒤      -> "시작!"
-
+    goSlow.addEventListener('click', () => {
+      stage.textContent = '준비...'
+      setTimeout(() => {
+        stage.textContent = '시작!'
+      }, 2000);
+    })
 
     // 1-3. 1-2 를 누른 뒤 2초 안에 #goLuck 을 눌러보세요.
     //      화면이 멈춰 있나요? 주석으로 적으세요
-
+    // 아니오
 
     // ========== PART 2 : Promise ==========
 
     // 2-1. 시간을 인자로 받아서 그 시간 뒤에 성공하는 delay 함수를 만드세요
     //        delay(500)  ->  0.5초 뒤 성공
-
+    const delay = (e) => new Promise(resolve => {
+      setTimeout(() => {
+        return resolve("성공")
+      }, e);
+    })
 
     // 2-2. ⭐ 예상 먼저
-    //        console.log(delay(500))
-    //      예상:
-    //      이유:
-
+    //  console.log(delay(500))
+    //      예상: Promise 함수가 반환될거같음.
+    //      이유: 왜냐면 Promise 함수에 있는것를 return 해서.
 
     // 2-3. delay 를 .then 으로 세 번 이어붙여서
     //      0.5초 간격으로 #stage 가 "하나" -> "둘" -> "셋" 으로 바뀌게 하세요
-
+    delay().then(r => console.log('하나')).then(r => console.log('둘')).then(r => console.log('셋'))
 
     // 2-4. 70% 확률로 성공하고 30% 확률로 실패하는 Promise 를 만들고
     //      .then 과 .catch 를 붙이세요. #goLuck 에 연결해서 여러 번 눌러보세요
-
+    const chance = () => new Promise((resolve, reject) => {
+      if ((Math.random() > .7)) {
+        return resolve("성공")
+      } else {
+        return reject("실패")
+      }
+    })
+    goLuck.addEventListener('click', () => {
+      chance().then(r => stage.textContent = r).catch(r => stage.textContent = r)
+    })
 
     // ========== PART 3 : async / await ==========
 
     // 3-1. 2-3 을 async/await 로 다시 쓰세요. #goChain 에 연결하세요.
     //      .then 버전과 어느 쪽이 읽기 편한지 주석으로 적으세요
-
-
+    async function chance1() {
+      const res = await chance()
+      return res
+    }
+    
+    
     // 3-2. ⭐ async 를 빼고 await 만 써보세요
     //      에러:
     //      확인했으면 되돌리세요
