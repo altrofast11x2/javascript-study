@@ -6,13 +6,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>08 - 비동기</title>
   <style>
-    body { background: #222; color: #fff; font-family: sans-serif; line-height: 1.7; padding: 16px; }
-    h2 { margin-top: 32px; border-bottom: 1px solid #555; padding-bottom: 4px; }
-    button, input, select { cursor: pointer; }
-    .card { border: 1px solid #888; padding: 10px; margin: 8px 0; }
-    .soldout { opacity: .4; text-decoration: line-through; }
-    .err { color: tomato; }
-    #loading { color: #8cf; }
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      line-height: 1.7;
+      padding: 16px;
+    }
+
+    h2 {
+      margin-top: 32px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 4px;
+    }
+
+    button,
+    input,
+    select {
+      cursor: pointer;
+    }
+
+    .card {
+      border: 1px solid #888;
+      padding: 10px;
+      margin: 8px 0;
+    }
+
+    .soldout {
+      opacity: .4;
+      text-decoration: line-through;
+    }
+
+    .err {
+      color: tomato;
+    }
+
+    #loading {
+      color: #8cf;
+    }
   </style>
 </head>
 
@@ -57,65 +88,98 @@
     // 1-1. ⭐ 순서 맞히기
     //      아래 세 줄을 "그냥 눈으로" 보고 찍힐 순서를 먼저 주석에 적으세요.
     //      그 다음 실행해서 맞았는지 확인하세요.
-    //        console.log("1")
-    //        setTimeout(() => console.log("2"), 0)
-    //        console.log("3")
-    //      내 예상:
-    //      실제:
-    
+    console.log("1")
+    setTimeout(() => console.log("2"), 0)
+    console.log("3")
+    //      내 예상: 1,3,2
+    //      실제: 1,3,2 
+
 
     // 1-2. #btnDelay 를 누르면 3초 뒤에 #out 에 "3초 지났다" 가 뜨게 하세요.
     //      누른 직후에는 #out 에 "기다리는 중..." 이 바로 떠야 합니다.
-
+    btnDelay.onclick = () => {
+      out.textContent = '기다리는중...'
+      setTimeout(() => {
+        out.textContent = '3초 지났다'
+      }, 3000);
+    }
 
     // 1-3. 1-2 를 누르고 나서 3초 안에 다른 버튼을 눌러보세요.
     //      화면이 멈춰 있나요? 주석으로 적으세요
-
+    // 아니오
 
     // ========== PART 2 : Promise ==========
 
     // 2-1. 1초 뒤에 "완료!" 로 성공하는 Promise 를 돌려주는 함수 wait1 을 만드세요
     //      const wait1 = () => new Promise(resolve => { ... })
-
-
+    const wait1 = () => new Promise(resolve => {
+      setTimeout(() => {
+        resolve("완료!");
+      }, 1000);
+    })
     // 2-2. wait1() 을 그냥 console.log 로 찍어보세요. 뭐가 나오나요?
     //      1초를 기다려도 "완료!" 가 아닙니다. 왜 그런지 주석으로 적으세요
-
+    console.log(wait1()); //Promise {pending} 이 뜸 왜냐면 1초 뒤에 나오는데 console.log() 는 1초뒤에 안나오고 그거보다 먼저 나왔기 때문이다
 
     // 2-3. .then 으로 결과를 받아 #out 에 보여주세요
-
+    wait1().then(r => out.textContent = r)
 
     // 2-4. 50% 확률로 성공/실패하는 Promise 를 만들고 (Math.random() < 0.5)
     //      .then 과 .catch 를 둘 다 붙이세요. #btnPromise 에 연결해서 여러 번 눌러보세요
-
+    const chance = () => new Promise((resovle, reject) => {
+      if (Math.random() > .5) {
+        resovle()
+      } else {
+        reject()
+      }
+    })
+    btnPromise.onclick = () => { chance().then(() => out.textContent = "성공").catch(() => out.textContent = "실패") }
 
     // ========== PART 3 : async / await ==========
 
     // 3-1. 2-3 을 async/await 로 다시 쓰세요
     //      async 함수를 만들고 그 안에서 await wait1()
-
-
+    async function wait1_1() {
+      const res = await wait1()
+      return res
+    }
+    wait1_1()
     // 3-2. ⭐ 일부러 터뜨리기
     //      async 를 빼고 await 만 써보세요. 에러를 주석에 적고 되돌리세요
-    //      에러:
-
-
+    //      에러:SyntaxError: await is only valid in async functions and the top level bodies of modules
+    // function wait1_1() {
+    //   const res = await wait1()
+    // }
     // 3-3. async 함수를 호출해서 그 반환값을 console.log 로 찍어보세요
     //      "완료!" 가 나오나요? 왜 그런지 주석으로 적으세요
-
+    console.log(wait1_1());
+    // 안나옵니다, async 는 항상 Promise 를 반환해서입니다.
 
     // ========== PART 4 : try / catch ==========
 
     // 4-1. 2-4 의 랜덤 Promise 를 async/await + try/catch 로 다시 쓰세요
     //      성공하면 #out 에, 실패하면 #err 에 표시
-
-
+    async function chance2() {
+      try {
+        const res = await chance()
+      } catch {
+        err.textContent = "실패";
+      }
+    }
+    chance2()
     // 4-2. try/catch 없이 await 로 실패하는 Promise 를 기다리면 어떻게 되는지
     //      콘솔을 보고 주석으로 적으세요
+    // async function chance3() {
+    //   const res = await chance()
+    // }
+    // console.log(chance3());
+    // 실패하면  Uncaught (in promise) undefined  오류가 뜸.
 
-
-    // 4-3. finally 를 붙여서 성공이든 실패든 #loading 을 비우게 하세요
-
+    // 4-3. 4-1 을 고쳐서, 시작할 때 #loading 에 "처리 중..." 을 넣으세요.
+    //      그리고 finally 를 붙여서 성공이든 실패든 그걸 다시 비우세요.
+    //      (넣는 곳은 한 군데, 비우는 곳도 한 군데. try 와 catch 양쪽에
+    //       비우는 코드를 넣지 말라는 게 finally 의 존재 이유입니다)
+    
 
     // ========== PART 5 : fetch 기본 ==========
 
