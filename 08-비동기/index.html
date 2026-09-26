@@ -127,15 +127,24 @@
 
     // 2-3. delay 를 .then 으로 세 번 이어붙여서
     //      0.5초 간격으로 #stage 가 "하나" -> "둘" -> "셋" 으로 바뀌게 하세요
-    delay().then(r => console.log('하나')).then(r => console.log('둘')).then(r => console.log('셋'))
+    // delay(500).then(() => {
+    //   stage.textContent = '하나'
+    //   return delay(500)
+    // }).then(() => {
+    //   stage.textContent = '둘'
+    //   return delay(500)
+    // }).then(() => {
+    //   stage.textContent = '셋'
+    //   return delay(500)
+    // })
 
     // 2-4. 70% 확률로 성공하고 30% 확률로 실패하는 Promise 를 만들고
     //      .then 과 .catch 를 붙이세요. #goLuck 에 연결해서 여러 번 눌러보세요
     const chance = () => new Promise((resolve, reject) => {
-      if ((Math.random() > .7)) {
-        return resolve("성공")
+      if ((Math.random() < .7)) {
+        resolve("성공")
       } else {
-        return reject("실패")
+        reject("실패")
       }
     })
     goLuck.addEventListener('click', () => {
@@ -146,13 +155,16 @@
 
     // 3-1. 2-3 을 async/await 로 다시 쓰세요. #goChain 에 연결하세요.
     //      .then 버전과 어느 쪽이 읽기 편한지 주석으로 적으세요
-    async function chance1() {
-      const res = await chance()
-      return res
+    async function chain() {
+      await delay(500)
+      stage.textContent = "하나"
+      await delay(500)
+      stage.textContent = "둘"
+      await delay(500)
+      stage.textContent = "셋"
     }
-    goChain.addEventListener('click', () => {
-      chance1().then(r => stage.textContent = r).catch(err => stage.textContent = err)
-    })
+    goChain.addEventListener('click', chain)
+    // 둘다 똑같다고 느껴짐. 좀더 편한건 async 쓴게 좀더 편한듯?
 
     // 3-2. ⭐ async 를 빼고 await 만 써보세요
     //      에러: Uncaught SyntaxError: await is only valid in async functions and the top level bodies of modules
@@ -162,40 +174,81 @@
     //      const f = async () => 7
     //      console.log(f())
     //      console.log(f() + 1)
-    //      예상: 잘 모르겠음 ;-; 굳이 예측을 해보자면 Promise 요소가 fulfilled 된거?
+    //      예상: 잘 모르겠음 Promise 요소가 반환되는데 밑에 + 1 꺼는 잘 모르겠음.
     //      이유: 잘 모르겠음 ;-;
-
 
     // ========== PART 4 : try / catch ==========
 
     // 4-1. 2-4 의 복불복을 async/await + try/catch 로 다시 쓰세요.
     //      성공하면 #stage 에, 실패하면 #oops 에 표시하세요
-
+    // async function chance1() {
+    //   try {
+    //     const res = await chance()
+    //     stage.textContent = res
+    //   } catch (err) {
+    //     oops.textContent = err
+    //   }
+    // }
 
     // 4-2. ⭐ try/catch 를 빼고 실패하는 Promise 를 await 하면
     //      콘솔에 뭐가 뜨나요?
-
+    //index.html:187 Uncaught (in promise) ReferenceError: err is not defined at chance1
 
     // 4-3. 4-1 을 고쳐서 시작할 때 #spin 에 "확인 중..." 을 넣고,
     //      성공이든 실패든 다시 비워지게 하세요
-
-
+    async function check() {
+      try {
+        spin.textContent = "확인중..."
+        const res = await chance()
+        stage.textContent = res
+      } catch (err) {
+        oops.textContent = err
+      } finally {
+        spin.textContent = ""
+      }
+    }
+    check()
     // ========== PART 5 : fetch ==========
 
     // 5-1. shows.json 을 fetch 해서 res 를 찍으세요. 뭐가 나왔나요?
-
-
+    // async function shows() {
+    //   const res = await fetch("./shows.json")
+    //   const data = await res.json()
+    //   return data;
+    // }
+    // shows()
     // 5-2. res.json() 을 찍으세요. 뭐가 나왔나요?
-
+    // async function shows() {
+    //   const res = await fetch("./shows.json")
+    //   const data = await res.json()
+    //   return console.log(data);;
+    // }
+    // shows()
+    // {shows: Array(5)} 가 뜸.
 
     // 5-3. 공연 목록을 꺼내세요. 5-1 과 5-2 를 보고 왜 그렇게 되는지 주석으로 적으세요
-
+    // async function shows() {
+    //   const res = await fetch("./shows.json")
+    //   const data = await res.json()
+    //   return console.log(data.shows);
+    // }
+    // shows()
 
     // 5-4. 공연 제목만 배열로 뽑으세요
-
+    // async function shows() {
+    //   const res = await fetch("./shows.json")
+    //   const data = await res.json()
+    //   return console.log(data.shows.map(e => e.title));
+    // }
+    // shows()
 
     // 5-5. 대극장 공연이 몇 개인지 세서 찍으세요
-
+    // async function shows() {
+    //   const res = await fetch("./shows.json")
+    //   const data = await res.json()
+    //   return console.log(data.shows.filter(e => e.hall === '대극장').length);
+    // }
+    // shows()
 
     // ========== PART 6 : fetch 의 함정 ==========
 
