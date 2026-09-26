@@ -433,35 +433,28 @@
     // ========== PART 9 : 종합 ==========
 
     // 9-1. 페이지가 열리면 자동으로 shows.json 을 불러와 #board2 에 그리세요
-    let save = []
-
-    async function load() {
-      try {
-        spin.textContent = "불러오는 중..."
-
-        const res = await fetch("./shows.json")
-        if (!res.ok) {
-          throw new Error(`불러오기 실패 (${res.status})`)
+    function render() {
+      goList.addEventListener('click', async () => {
+        try {
+          spin.textContent = "불러오는 중..."
+          const res = await fetch("./shows.json")
+          if (!res.ok) {
+            throw new Error(`불러오기 실패 (${res.status})`)
+          }
+          const data = await res.json()
+          board2.innerHTML = data.shows
+            .map(e =>
+              `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+              ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+            </div>`).join("\n")
+        } catch (error) {
+          board2.textContent = error.message
+        } finally {
+          spin.textContent = ""
         }
-
-        const data = await res.json()
-        save = data.shows
-
-        board2.innerHTML = save
-          .map(e =>
-            `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
-          ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
-        </div>`
-          ).join("\n")
-
-      } catch (error) {
-        board2.textContent = error.message
-      } finally {
-        spin.textContent = ""
-      }
+      })
     }
-
-    load()
+    render()
 
     // 9-2. 검색이나 정렬할 때마다 fetch 가 다시 돌면 안 됩니다. 그렇게 만드세요.
     //      왜 그래야 하는지 주석으로 적으세요
@@ -474,7 +467,7 @@
       board2.innerHTML = save
         .filter(e => e.title.includes(search))
         .map(e =>
-          `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+          `<div>
         ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
       </div>`
         ).join("\n")
