@@ -48,6 +48,10 @@
     select {
       cursor: pointer;
     }
+
+    #board {
+      white-space: pre-line;
+    }
   </style>
 </head>
 
@@ -123,20 +127,20 @@
     // 2-2. ⭐ 예상 먼저
     //  console.log(delay(500))
     //      예상: Promise 함수가 반환될거같음.
-    //      이유: 왜냐면 Promise 함수에 있는것를 return 해서.
+    //      이유: 왜냐면 Promise 함수는 Promise 를 반환해서
 
     // 2-3. delay 를 .then 으로 세 번 이어붙여서
     //      0.5초 간격으로 #stage 가 "하나" -> "둘" -> "셋" 으로 바뀌게 하세요
-    // delay(500).then(() => {
-    //   stage.textContent = '하나'
-    //   return delay(500)
-    // }).then(() => {
-    //   stage.textContent = '둘'
-    //   return delay(500)
-    // }).then(() => {
-    //   stage.textContent = '셋'
-    //   return delay(500)
-    // })
+    delay(500).then(() => {
+      stage.textContent = '하나'
+      return delay(500)
+    }).then(() => {
+      stage.textContent = '둘'
+      return delay(500)
+    }).then(() => {
+      stage.textContent = '셋'
+      return delay(500)
+    })
 
     // 2-4. 70% 확률로 성공하고 30% 확률로 실패하는 Promise 를 만들고
     //      .then 과 .catch 를 붙이세요. #goLuck 에 연결해서 여러 번 눌러보세요
@@ -174,21 +178,21 @@
     //      const f = async () => 7
     //      console.log(f())
     //      console.log(f() + 1)
-    //      예상: 잘 모르겠음 Promise 요소가 반환되는데 밑에 + 1 꺼는 잘 모르겠음.
+    //      예상: 그냥 Promise 요소 랑 Promise+1 요소가 보일거같음.
     //      이유: 잘 모르겠음 ;-;
 
     // ========== PART 4 : try / catch ==========
 
     // 4-1. 2-4 의 복불복을 async/await + try/catch 로 다시 쓰세요.
     //      성공하면 #stage 에, 실패하면 #oops 에 표시하세요
-    // async function chance1() {
-    //   try {
-    //     const res = await chance()
-    //     stage.textContent = res
-    //   } catch (err) {
-    //     oops.textContent = err
-    //   }
-    // }
+    async function chance1() {
+      try {
+        const res = await chance()
+        stage.textContent = res
+      } catch (err) {
+        oops.textContent = err
+      }
+    }
 
     // 4-2. ⭐ try/catch 를 빼고 실패하는 Promise 를 await 하면
     //      콘솔에 뭐가 뜨나요?
@@ -207,109 +211,261 @@
         spin.textContent = ""
       }
     }
-    check()
+    goLuck.addEventListener('click', check)
     // ========== PART 5 : fetch ==========
 
     // 5-1. shows.json 을 fetch 해서 res 를 찍으세요. 뭐가 나왔나요?
-    // async function shows() {
-    //   const res = await fetch("./shows.json")
-    //   const data = await res.json()
-    //   return data;
-    // }
-    // shows()
+    async function shows() {
+      const res = await fetch("./shows.json")
+      const data = await res.json()
+      return data;
+    }
+    shows()
     // 5-2. res.json() 을 찍으세요. 뭐가 나왔나요?
-    // async function shows() {
-    //   const res = await fetch("./shows.json")
-    //   const data = await res.json()
-    //   return console.log(data);;
-    // }
-    // shows()
+    async function shows() {
+      const res = await fetch("./shows.json")
+      const data = await res.json()
+      return console.log(data);;
+    }
+    shows()
     // {shows: Array(5)} 가 뜸.
 
     // 5-3. 공연 목록을 꺼내세요. 5-1 과 5-2 를 보고 왜 그렇게 되는지 주석으로 적으세요
-    // async function shows() {
-    //   const res = await fetch("./shows.json")
-    //   const data = await res.json()
-    //   return console.log(data.shows);
-    // }
-    // shows()
+    async function shows() {
+      const res = await fetch("./shows.json")
+      const data = await res.json()
+      return console.log(data.shows);
+    }
+    shows()
 
     // 5-4. 공연 제목만 배열로 뽑으세요
-    // async function shows() {
-    //   const res = await fetch("./shows.json")
-    //   const data = await res.json()
-    //   return console.log(data.shows.map(e => e.title));
-    // }
-    // shows()
+    async function shows() {
+      const res = await fetch("./shows.json")
+      const data = await res.json()
+      return console.log(data.shows.map(e => e.title));
+    }
+    shows()
 
     // 5-5. 대극장 공연이 몇 개인지 세서 찍으세요
-    // async function shows() {
-    //   const res = await fetch("./shows.json")
-    //   const data = await res.json()
-    //   return console.log(data.shows.filter(e => e.hall === '대극장').length);
-    // }
-    // shows()
+    async function shows() {
+      const res = await fetch("./shows.json")
+      const data = await res.json()
+      return console.log(data.shows.filter(e => e.hall === '대극장').length);
+    }
+    shows()
 
     // ========== PART 6 : fetch 의 함정 ==========
 
     // 6-1. ⭐ 예상 먼저 — #goMiss 에 연결
     //      nope.json 을 fetch 하고 try/catch 로 감싸세요.
-    //      catch 가 잡힐까요?  예상:
-    //      실제:
-
+    //      catch 가 잡힐까요?  예상: 404Not Found 뜰꺼같음
+    //      실제: GET http://127.0.0.1:5500/08-%EB%B9%84%EB%8F%99%EA%B8%B0/nope.json 404 (Not Found)
+    //           VM1338:1 Uncaught (in promise) SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    async function shows() {
+      try {
+        const res = await fetch("./nope.json")
+        const data = await res.json()
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    shows()
 
     // 6-2. res.ok 와 res.status 를 찍으세요
-
+    async function shows() {
+      try {
+        const res = await fetch("./shows.json")
+        const data = await res.json()
+        console.log(res.ok); //true
+        console.log(res.status); //200
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    shows()
 
     // 6-3. 6-1 이 실패했을 때도 catch 로 넘어가게 만들고
     //      #oops 에 "불러오기 실패 (404)" 처럼 표시하세요
-
+    // async function shows() {
+    //   try {
+    //     const res = await fetch("./ndas.json")
+    //     if(!res.ok){
+    //       throw new Error(`불러오기 실패 (${res.status})` )
+    //     }
+    //     const data = await res.json()
+    //   } catch (error) {
+    //     oops.textContent = error.message
+    //   }
+    // }
+    // shows()
 
     // 6-4. 6-3 을 shows.json 으로도 돌려보세요. 어떻게 되나요?
-
+    // 아무런일이 발생안하고 잘 fetch 됨
 
     // ========== PART 7 : Promise.all ==========
 
     // 7-1. shows.json 과 member.json 을 하나씩 순서대로 await 하고
     //      console.time / console.timeEnd 로 걸린 시간을 재세요
-
+    async function promise(params) {
+      console.time()
+      const res1 = await fetch("./shows.json")
+      const data1 = await res1.json()
+      const res2 = await fetch("./member.json")
+      const data2 = await res2.json()
+      console.timeEnd();
+    }
+    promise()
 
     // 7-2. 같은 걸 동시에 가져오도록 바꾸고 시간을 비교하세요
-
-
+    async function test() {
+      console.time()
+      await Promise.all([
+        fetch("./shows.json"),
+        fetch("./member.json"),
+      ])
+      console.timeEnd()
+    }
+    test()
     // 7-3. #goPair 에 연결해서 #stage 에 이렇게 보여주세요
     //      -> "노벨(GOLD) - 공연 5개, 쿠폰 2장"
-
+    async function gold() {
+      const res = await fetch("./shows.json")
+      const res2 = await fetch("./member.json")
+      const data = await res.json()
+      const data2 = await res2.json()
+      return console.log(`${data2.name}(${data2.grade}) - 공연 ${data.shows.length}개 쿠폰 ${data2.coupon}장`);
+    }
+    gold();
 
     // ========== PART 8 : 로딩과 에러 ==========
 
     // 8-1. #goList 를 누르면 #spin 에 "불러오는 중..." 이 뜨고,
     //      다 받으면 사라지면서 #board 에 공연 카드가 그려지게 하세요.
     //      카드에는 제목 / 가격 / 남은 좌석 / 극장이 보여야 합니다
-
+    // goList.addEventListener('click', async () => {
+    //   try {
+    //     spin.textContent = "불러오는 중..."
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) {
+    //       throw new Error(`불러오기 실패 (${res.status})`)
+    //     }
+    //     const data = await res.json()
+    //     board.textContent = data.shows
+    //       .map(e => `${e.title} / ${e.price} / ${e.seats} / ${e.hall}`)
+    //       .join("\n")
+    //   } catch (error) {
+    //     board.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ""
+    //   }
+    // })
 
     // 8-2. 좌석이 0 인 카드에 "full" 클래스를 붙이세요
-
+    // goList.addEventListener('click', async () => {
+    //   try {
+    //     spin.textContent = "불러오는 중..."
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) {
+    //       throw new Error(`불러오기 실패 (${res.status})`)
+    //     }
+    //     const data = await res.json()
+    //     board.innerHTML = data.shows
+    //       .map(e =>
+    //         `<div class="${!e.seats ? "full" : ""}">
+    //           ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //         </div>`)
+    //       .join("\n")
+    //   } catch (error) {
+    //     board.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ""
+    //   }
+    // })
 
     // 8-3. 좌석이 10석 미만이고 0 은 아닌 카드에 "hot" 클래스를 붙이세요
-
+    // goList.addEventListener('click', async () => {
+    //   try {
+    //     spin.textContent = "불러오는 중..."
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) {
+    //       throw new Error(`불러오기 실패 (${res.status})`)
+    //     }
+    //     const data = await res.json()
+    //     board.innerHTML = data.shows
+    //       .map(e =>
+    //         `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+    //           ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //         </div>`)
+    //       .join("\n")
+    //   } catch (error) {
+    //     board.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ""
+    //   }
+    // })
 
     // 8-4. #goList 를 두 번 눌러보세요. 뭐가 잘못됐나요? 고치세요
-
+    // 같은 EventListener 이 두개 가 있습니다
+    // 이벤트 리스너를 여러번 등록하지 않아도 하나만 등록됩니다.
 
     // 8-5. 에러가 나도 #spin 이 남지 않게 하세요
-
+    // goList.addEventListener('click', async () => {
+    //   try {
+    //     spin.textContent = "불러오는 중..."
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) {
+    //       throw new Error(`불러오기 실패 (${res.status})`)
+    //     }
+    //     const data = await res.json()
+    //     board.innerHTML = data.shows
+    //       .map(e =>
+    //         `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+    //           ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //         </div>`)
+    //       .join("\n")
+    //   } catch (error) {
+    //     board.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ""
+    //   }
+    // })
 
     // ========== PART 9 : 종합 ==========
 
     // 9-1. 페이지가 열리면 자동으로 shows.json 을 불러와 #board2 에 그리세요
-
+    function render() {
+      goList.addEventListener('click', async () => {
+        try {
+          spin.textContent = "불러오는 중..."
+          const res = await fetch("./shows.json")
+          if (!res.ok) {
+            throw new Error(`불러오기 실패 (${res.status})`)
+          }
+          const data = await res.json()
+          board.innerHTML = data.shows
+            .map(e =>
+            `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+              ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+            </div>`)
+            .join("\n")
+        } catch (error) {
+          board.textContent = error.message
+        } finally {
+          spin.textContent = ""
+        }
+      })
+    }
+    render()
 
     // 9-2. 검색이나 정렬할 때마다 fetch 가 다시 돌면 안 됩니다. 그렇게 만드세요.
     //      왜 그래야 하는지 주석으로 적으세요
-
+    // 우선은 계속 fetch 하면 데이터가 많으면 시간도 오래 걸리기도하고 트래픽이 많이 길어져서입니다.
 
     // 9-3. #find 에 입력할 때마다 제목에 검색어가 들어간 것만 그리세요
+    find.addEventListener('change', () => {
+      const search = find.value
+      
+    })
 
 
     // 9-4. #by 로 제목순 / 가격 낮은순 / 가격 높은순 정렬이 되게 하세요.
