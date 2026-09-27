@@ -460,50 +460,176 @@
     // 9-2. 검색이나 정렬할 때마다 fetch 가 다시 돌면 안 됩니다. 그렇게 만드세요.
     //      왜 그래야 하는지 주석으로 적으세요
     // 우선은 계속 fetch 하면 데이터가 많으면 시간도 오래 걸리기도하고 트래픽이 많이 길어져서입니다.
-    let save = []
-    async function render() {
-      try {
-        spin.textContent = "불러오는중..."
-        const res = await fetch("./shows.json")
-        if (!res.ok) throw new Error(`불러오기 실패 (${res.status})`)
-        const data = await res.json()
-        board2.innerHTML = data.shows
-          .map(e =>
-            `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
-            ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
-            </div>`).join("\n")
-      } catch (error) {
-        board2.textContent = error.message
-      } finally {
-        spin.textContent = ""
-      }
-    }
-    render()
-    find.addEventListener('input',()=>{
-      const 
-    })
+    // let save = []
+    // const draw = (list) => {
+    //   board2.innerHTML = list.map(e =>
+    //     `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+    //      ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //     </div>`
+    //   ).join("\n")
+    // }
+    // async function render() {
+    //   try {
+    //     spin.textContent = '불러오는중...'
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) throw new Error(`불러오기 실패 (${res.status})`)
+    //     const data = await res.json()
+    //     save = data.shows
+    //     draw(save)
+    //   } catch (error) {
+    //     board2.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ''
+    //   }
+    // }
+    // render()
+    // $("#find").addEventListener('input', () => {
+    //   const search = $("#find").value
+    //   draw(save.filter(e => e.title.includes(search)))
+    // })
     // 9-3. #find 에 입력할 때마다 제목에 검색어가 들어간 것만 그리세요
-    // find.addEventListener('input', () => {
-    //   const search = find.value.trim()
-
-    //   board2.innerHTML = save
-    //     .filter(e => e.title.includes(search))
-    //     .map(e =>
-    //       `<div>
-    //     ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
-    //   </div>`
-    //     ).join("\n")
+    // let save = []
+    // const draw = (list) => {
+    //   board2.innerHTML = list.map(e =>
+    //     `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""}">
+    //      ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //     </div>`
+    //   ).join("\n")
+    // }
+    // async function render() {
+    //   try {
+    //     spin.textContent = '불러오는중...'
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) throw new Error(`불러오기 실패 (${res.status})`)
+    //     const data = await res.json()
+    //     save = data.shows
+    //     draw(save)
+    //   } catch (error) {
+    //     board2.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ''
+    //   }
+    // }
+    // render()
+    // $("#find").addEventListener('input', () => {
+    //   const search = $("#find").value
+    //   draw(save.filter(e => e.title.includes(search)))
     // })
 
     // 9-4. #by 로 제목순 / 가격 낮은순 / 가격 높은순 정렬이 되게 하세요.
     //      원본 배열이 바뀌면 안 됩니다
-
+    // let save = []
+    // const draw = (list) => {
+    //   board2.innerHTML = list.map(e =>
+    //     `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""} ${!e.seats ? "full" : ""}">
+    //        ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //     </div>`
+    //   ).join("\n")
+    // }
+    // async function render() {
+    //   try {
+    //     spin.textContent = '불러오는중...'
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) throw new Error(`불러오기 실패 (${res.status})`)
+    //     const data = await res.json()
+    //     save = data.shows
+    //     draw(save)
+    //   } catch (error) {
+    //     board2.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ''
+    //   }
+    // }
+    // render()
+    // $("#find").addEventListener('input', () => {
+    //   const search = $("#find").value
+    //   draw(save.filter(e => e.title.includes(search)))
+    // })
+    // $("#by").addEventListener('change', () => {
+    //   let list = [...save]
+    //   if (by.value === 'title') return draw(list.sort((a, b) => a.title.localeCompare(b.title)))
+    //   if (by.value === 'cheap') return draw(list.sort((a, b) => a.price - b.price))
+    //   if (by.value === 'rich') return draw(list.sort((a, b) => b.price - a.price))
+    // })
 
     // 9-5. #onlyOpen 을 체크하면 좌석이 남은 공연만 보이게 하세요
-
-
+    // let save = []
+    // const draw = (list) => {
+    //   board2.innerHTML = list.map(e =>
+    //     `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""} ${!e.seats ? "full" : ""}">
+    //        ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+    //     </div>`
+    //   ).join("\n")
+    // }
+    // async function render() {
+    //   try {
+    //     spin.textContent = '불러오는중...'
+    //     const res = await fetch("./shows.json")
+    //     if (!res.ok) throw new Error(`불러오기 실패 (${res.status})`)
+    //     const data = await res.json()
+    //     save = data.shows
+    //     draw(save)
+    //   } catch (error) {
+    //     board2.textContent = error.message
+    //   } finally {
+    //     spin.textContent = ''
+    //   }
+    // }
+    // render()
+    // $("#find").addEventListener('input', () => {
+    //   const search = $("#find").value
+    //   draw(save.filter(e => e.title.includes(search)))
+    // })
+    // $("#by").addEventListener('change', () => {
+    //   let list = [...save]
+    //   if (by.value === 'title') return draw(list.sort((a, b) => a.title.localeCompare(b.title)))
+    //   if (by.value === 'cheap') return draw(list.sort((a, b) => a.price - b.price))
+    //   if (by.value === 'rich') return draw(list.sort((a, b) => b.price - a.price))
+    // })
+    // $("#onlyOpen")?.addEventListener('input', () => {
+    //   let list = [...save]
+    //   if (onlyOpen.checked) return draw(list.filter(e => e.seats))
+    //   else draw(list)
+    // })
     // 9-6. 검색 / 정렬 / 체크박스 셋이 동시에 먹게 하세요
-
+    let save = []
+    const draw = (list) => {
+      board2.innerHTML = list.map(e =>
+        `<div class="${e.seats <= 10 && e.seats > 0 ? "hot" : ""} ${!e.seats ? "full" : ""}">
+           ${e.title} / ${e.price} / ${e.seats} / ${e.hall}
+        </div>`
+      ).join("\n")
+    }
+    async function render() {
+      try {
+        spin.textContent = '불러오는중...'
+        const res = await fetch("./shows.json")
+        if (!res.ok) throw new Error(`불러오기 실패 (${res.status})`)
+        const data = await res.json()
+        save = data.shows
+        draw(save)
+      } catch (error) {
+        board2.textContent = error.message
+      } finally {
+        spin.textContent = ''
+      }
+    }
+    render()
+    $("#find").addEventListener('input', () => {
+      const search = $("#find").value
+      draw(save.filter(e => e.title.includes(search)))
+    })
+    $("#by").addEventListener('change', () => {
+      let list = [...save]
+      if (by.value === 'title') return draw(list.sort((a, b) => a.title.localeCompare(b.title)))
+      if (by.value === 'cheap') return draw(list.sort((a, b) => a.price - b.price))
+      if (by.value === 'rich') return draw(list.sort((a, b) => b.price - a.price))
+    })
+    $("#onlyOpen")?.addEventListener('input', () => {
+      let list = [...save]
+      if (onlyOpen.checked) return draw(list.filter(e => e.seats))
+      else draw(list)
+    })
 
   </script>
 </body>
