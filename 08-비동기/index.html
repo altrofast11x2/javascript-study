@@ -112,13 +112,13 @@
     // ========== PART 1 : 실행 순서 ==========
 
     // 1-1. ⭐ 예상 — 찍히는 순서를 먼저 적고 나서 실행하세요
-    console.log("A")
-    setTimeout(() => console.log("B"), 0)
-    Promise.resolve().then(() => {
-      console.log("C")
-      setTimeout(() => console.log("D"), 0)
-    })
-    setTimeout(() => console.log("E"), 0)
+    // console.log("A")
+    // setTimeout(() => console.log("B"), 0)
+    // Promise.resolve().then(() => {
+    //   console.log("C")
+    //   setTimeout(() => console.log("D"), 0)
+    // })
+    // setTimeout(() => console.log("E"), 0)
     //  console.log("F")
     //      예상: AFCDBED
     //      실제: AFCDBED
@@ -176,15 +176,15 @@
     // })
 
     // 2-2. ⭐ 예상
-    console.log(delay(300))
+    // console.log(delay(300))
     //      예상: Promise 요소가 변환될거같음
     //      실제: Promise {<pending>}
     //      이유: Delay 가 보내고 있는걸 바로 찍어버리니까 뜸.
 
 
     // 2-3. ⭐ 예상 — 찍히는 순서
-    delay(300).then(() => console.log("끝"))
-    console.log("시작")
+    // delay(300).then(() => console.log("끝"))
+    // console.log("시작")
     //      예상: 시작 끝
     //      실제: 시작 끝
 
@@ -192,27 +192,27 @@
     // 2-4. #trio 를 누르면 #view 가 0.5초 간격으로
     //      "하나" -> "둘" -> "셋" 으로 바뀌게 하세요. .then 체인으로만 쓰세요.
     //      (await 는 PART 3 에서 씁니다)
-    $("#trio").addEventListener('click', () => {
-      timer.forEach(clearTimeout)
-      timer = timer
-      console.log(timer);
-      delay(500)
-        .then(() => { view.textContent = "하나"; return delay(500) })
-        .then(() => { view.textContent = "둘"; return delay(500) })
-        .then(() => { view.textContent = "셋"; return delay(500) })
-    })
+    // $("#trio").addEventListener('click', () => {
+    //   timer.forEach(clearTimeout)
+    //   timer = timer
+    //   console.log(timer);
+    //   delay(500)
+    //     .then(() => { view.textContent = "하나"; return delay(500) })
+    //     .then(() => { view.textContent = "둘"; return delay(500) })
+    //     .then(() => { view.textContent = "셋"; return delay(500) })
+    // })
     // 2-5. ⭐ 예상 — .then 이 돌려준 값은 다음 .then 으로 넘어갑니까?
-    Promise.resolve(10)
-      .then(n => n * 2)
-      .then(n => console.log(n))
+    // Promise.resolve(10)
+    //   .then(n => n * 2)
+    //   .then(n => console.log(n))
     //      예상: 20
     //      실제: 20
 
 
     // 2-6. ⭐ 예상 — 중간에서 return 을 안 하면?
-    Promise.resolve(10)
-      .then(n => { n * 2 })
-      .then(n => console.log(n))
+    // Promise.resolve(10)
+    //   .then(n => { n * 2 })
+    //   .then(n => console.log(n))
     //      예상: 10
     //      실제: undefined
 
@@ -220,17 +220,17 @@
     // 2-7. 50% 확률로 성공, 50% 확률로 실패하는 Promise 를 만들고
     //      #coin 에 연결하세요. 성공은 #view, 실패는 #alarm 에 나오게 하세요.
     //      여기서는 .then / .catch 로 쓰세요.
-    const chance = (e) => new Promise((resolve, reject) => {
-      if (Math.random() < .5) {
-        return resolve("성공")
-      } else {
-        return reject("실패")
-      }
-    })
+    // const chance = (e) => new Promise((resolve, reject) => {
+    //   if (Math.random() < .5) {
+    //     return resolve("성공")
+    //   } else {
+    //     return reject("실패")
+    //   }
+    // })
 
-    $("#coin").addEventListener('click', () => {
-      chance().then(r => view.textContent = r).catch(err => alarm.textContent = err)
-    })
+    // $("#coin").addEventListener('click', () => {
+    //   chance().then(r => view.textContent = r).catch(err => alarm.textContent = err)
+    // })
 
     // ========== PART 3 : async / await ==========
 
@@ -238,68 +238,113 @@
 
 
     // 3-2. ⭐ 예상 — async 함수 밖에서 await 를 쓰면?
-    //      예상:
-    //      실제:
+    //      예상:  await 는 async 밖에서 쓸수 없거나 참조 에러가 뜰거같음
+    //      실제: Uncaught SyntaxError: await is only valid in async functions and the top level bodies of modules
     //      확인했으면 그 줄은 주석 처리하세요. 안 그러면 아래 전부 안 돕니다.
 
-
     // 3-3. ⭐ 예상
-    //        const f = async () => "안녕"
-    //        console.log(f())
-    //        console.log(typeof f())
-    //        f().then(v => console.log(v))
-    //      예상:
-    //      실제:
+    // const f = async () => "안녕"
+    // console.log(f())
+    // console.log(typeof f())
+    // f().then(v => console.log(v))
+    //      예상: Promise {<fulfilled: "안녕"} 뜨고 그 밑에 OBJECT 뜨고 그 밑에 안녕 뜰거같음
+    //      실제: Promise {<fulfilled: "안녕"} 뜨고 그 밑에 OBJECT 뜨고 그 밑에 안녕 뜰거같음
 
 
     // 3-4. ⭐ 예상 — 이 둘의 차이. 총 몇 초가 걸릴지도 같이 적으세요.
-    //        const list = [500, 500, 500]
+    // const list = [500, 500, 500]
     //
     //        (A) for (const ms of list) { await delay(ms); console.log("A", ms) }
     //
     //        (B) list.forEach(async (ms) => { await delay(ms); console.log("B", ms) })
     //            console.log("B 끝")
-    //      예상:
-    //      실제:
-    //      왜 그런지:
+    //      예상: 둘다 똑같을거같음
+    //      실제: 둘다 출력되는 시간은 똑같은데 출력은 다름.
+    //      왜 그런지: forEach 와 for 은 똑같은걸로 알고 있습니다
 
 
     // 3-5. 3-4 의 (B) 를 "전부 끝난 뒤에 끝났다는 걸 알 수 있게" 고치세요.
-
+    const list = [500, 500, 500]
+    async function end(params) {
+      list.forEach(async (ms) => { await delay(ms); console.log("B", ms); })
+      await delay(list.reduce((acc, cur) => acc + cur)); console.log("asd");
+    }
+    end()
 
     // ========== PART 4 : try / catch / finally ==========
 
     // 4-1. 2-7 을 async / await + try / catch 로 다시 쓰세요.
-
+    // async function chance() {
+    //   try {
+    //     if (Math.random() > .5) {
+    //       view.textContent = "성공"
+    //     } else {
+    //       throw new Error("실패")
+    //     }
+    //   } catch (error) {
+    //     alarm.textContent = error.message
+    //   }
+    // }
+    // $("#coin").addEventListener('click', () => {
+    //   chance()
+    // })
 
     // 4-2. ⭐ 예상 — 4-1 에서 try/catch 를 빼고 실패하게 만들면
     //      화면은 어떻게 되고 콘솔엔 뭐가 나옵니까?
-    //      예상:
-    //      실제:
+    //      예상: error is not defined
+    //      실제: Uncaught (in promise) ReferenceError: error is not defined
 
 
     // 4-3. 4-1 에 #note 를 붙이세요.
     //      시작할 때 "던지는 중...", 성공이든 실패든 끝나면 비워져야 합니다.
-
+    async function chance() {
+      try {
+        $("#note").textContent = '던지는 중...'
+        if (Math.random() > .5) {
+          await delay(1500)
+          $("#view").textContent = "성공"
+        } else {
+          throw new Error("실패")
+        }
+      } catch (error) {
+        await delay(1000)
+        $("#alarm").textContent = error.message
+      } finally {
+        await delay(500)
+        $("#note").textContent = ""
+        await delay(2000)
+        $("#view").textContent = "여기에 결과"
+        await delay(2000)
+        $("#alarm").textContent = ""
+      }
+    }
+    $("#coin").addEventListener('click', () => {
+      chance()
+    })
 
     // 4-4. ⭐ 예상 — try 안에 return 이 있으면 finally 는 실행됩니까?
-    //      예상:
-    //      실제 (직접 짜서 확인):
-
+    //      예상: 안될거같음.
+    //      실제 (직접 짜서 확인): 실제로 안됨
 
     // 4-5. ⭐ 예상 — try 와 finally 에 return 이 둘 다 있으면 어느 쪽이 나옵니까?
-    //      예상:
-    //      실제:
-
+    //      예상: 먼저 위에서 return 을 돌린쪽이 먼저나올거같습니다. 즉 try 쪽에서 return 이 되어 trycatch 밑에 있는것들은 실행이 안될것같습니다
+    //      실제: 실제로 안됨.
 
     // ========== PART 5 : fetch ==========
 
     // 5-1. books.json 을 fetch 한 결과를 그대로 찍으세요. 뭐가 나왔습니까?
-
+    // console.log(fetch("./books.json"));
+    //Promise {pending} 이 야무지게 뜨네?
 
     // 5-2. 거기에 .json() 을 불러서 찍으세요. 뭐가 나왔습니까?
     //      5-1 과 5-2 를 보고 await 가 두 번 필요한 이유를 적으세요:
-
+    async function render() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      return data
+    }
+    render()
+    //이유: 첫번째는 fetch 하는거 두번쨰는 fetch 한것의 파일 형식을 알려주는것.
 
     // 5-3. ⭐ 예상 — 같은 응답에 .json() 을 두 번 부르면?
     //        const res = await fetch("books.json")
