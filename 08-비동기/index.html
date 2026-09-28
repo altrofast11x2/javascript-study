@@ -341,7 +341,6 @@
     async function render() {
       const res = await fetch("./books.json")
       const data = await res.json()
-      return data
     }
     render()
     //이유: 첫번째는 fetch 하는거 두번쨰는 fetch 한것의 파일 형식을 알려주는것.
@@ -350,19 +349,29 @@
     //        const res = await fetch("books.json")
     //        console.log(await res.json())
     //        console.log(await res.json())
-    //      예상:
-    //      실제:
+    //      예상: 그냥 json 이 두개가 찍힐거같음.
+    //      실제: index.html:344 Uncaught (in promise) TypeError: Failed to execute 'json' on 'Response': body stream already read at render
 
 
     // 5-4. 도서관 이름과 지점을 꺼내서 "노벨도서관 본관" 으로 찍으세요.
-
+    async function library() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      console.log(`${data.library.name} ${data.library.branch}`);
+    }
+    library()
 
     // 5-5. 책 제목만 배열로 뽑으세요.
-
+    async function title_arr() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      console.log(data.books.map(e => e.title));
+    }
+    title_arr()
 
     // 5-6. 책마다 "대출 가능 권수" 를 구해서
     //      { title, 가능 } 모양의 배열로 만드세요.
-
+    
 
     // 5-7. 대출 가능 권수가 가장 많은 책의 제목을 구하세요.
 
