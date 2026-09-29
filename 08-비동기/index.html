@@ -112,16 +112,16 @@
     // ========== PART 1 : 실행 순서 ==========
 
     // 1-1. ⭐ 예상 — 찍히는 순서를 먼저 적고 나서 실행하세요
-    // console.log("A")
-    // setTimeout(() => console.log("B"), 0)
-    // Promise.resolve().then(() => {
-    //   console.log("C")
-    //   setTimeout(() => console.log("D"), 0)
-    // })
-    // setTimeout(() => console.log("E"), 0)
+    console.log("A")
+    setTimeout(() => console.log("B"), 0)
+    Promise.resolve().then(() => {
+      console.log("C")
+      setTimeout(() => console.log("D"), 0)
+    })
+    setTimeout(() => console.log("E"), 0)
     //  console.log("F")
-    //      예상: AFCDBED
-    //      실제: AFCDBED
+    //      예상: ACDBED
+    //      실제: ACDBED
     //      틀렸으면 왜 틀렸는지 적으세요: 안틀림 (솔직히 말하면 찍음.)
 
 
@@ -141,19 +141,17 @@
     //        1.8초 뒤   ->  "출발!"
     let timer = [];
     const delay = (e) => new Promise(resolve => {
-      const time = setTimeout(resolve, e);
+      const time = setTimeout(resolve, e); //일부로 시간 안쓰고 settimeout 으로 함수 만들어서 씀.
       return timer.push(time)
     })
     $("#step").addEventListener('click', async () => {
       timer.forEach(clearTimeout);
-      timer = timer
+      timer = []
       let t = 3
-      view.textContent = `${t--}`
-      await delay(600)
-      view.textContent = `${t--}`
-      await delay(1200)
-      view.textContent = `${t--}`
-      await delay(1800)
+      for (const ms of [600, 1200, 1800]) {
+        view.textContent = `${t--}`
+        await delay(ms)
+      }
       view.textContent = `출발!`
     })
 
@@ -258,10 +256,9 @@
     //
     //        (B) list.forEach(async (ms) => { await delay(ms); console.log("B", ms) })
     //            console.log("B 끝")
-    //      예상: 둘다 똑같을거같음
-    //      실제: 둘다 출력되는 시간은 똑같은데 출력은 다름.
-    //      왜 그런지: forEach 와 for 은 똑같은걸로 알고 있습니다
-
+    //      예상: 첫번째꺼는 1.5초 걸리고 두번째꺼는 동시에 실행해서 .5초 걸릴거같음
+    //      실제: 첫번째꺼는 1.5초 걸리고 두번째꺼는 동시에 실행해서 .5초 걸릴거같음
+    //      왜 그런지: forEach는 await 를 기다리지 않음.  
 
     // 3-5. 3-4 의 (B) 를 "전부 끝난 뒤에 끝났다는 걸 알 수 있게" 고치세요.
     // const list = [500, 500, 500]
@@ -324,11 +321,11 @@
 
     // 4-4. ⭐ 예상 — try 안에 return 이 있으면 finally 는 실행됩니까?
     //      예상: 안될거같음.
-    //      실제 (직접 짜서 확인): 실제로 안됨
+    //      실제 (직접 짜서 확인): finally 뜸
 
     // 4-5. ⭐ 예상 — try 와 finally 에 return 이 둘 다 있으면 어느 쪽이 나옵니까?
     //      예상: 먼저 위에서 return 을 돌린쪽이 먼저나올거같습니다. 즉 try 쪽에서 return 이 되어 trycatch 밑에 있는것들은 실행이 안될것같습니다
-    //      실제: 실제로 안됨.
+    //      실제: 반환되서 finally 가 뜸
 
     // ========== PART 5 : fetch ==========
 
@@ -432,36 +429,116 @@
     // ghost.json 은 없습니다. broken.json 은 내용이 깨져 있습니다. 둘 다 건드리지 마세요.
 
     // 6-1. ⭐ 예상 — #load404 에 연결하세요.
-    //      ghost.json 을 fetch 하고 try/catch 로 감쌌습니다. catch 가 잡힙니까?
-    //      예상:
-    //      실제:
 
+    // async function load444() {
+    //   try {
+    //     const res = await fetch("./ghost.json")
+    //     if (!res.ok) {
+    //       throw new Error(`${res.status}`)
+    //     }
+    //     const data = await res.json()
+    //     console.log(res.ok);
+    //   } catch (error) {
+    //     console.log(`${error.message}`);
+    //   }
+    // }
+    // $("#load404").addEventListener('click', load444)
+
+    //      ghost.json 을 fetch 하고 try/catch 로 감쌌습니다. catch 가 잡힙니까?
+    //      예상: 네 당연히 잡히겠죠
+    //      실제: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
 
     // 6-2. 6-1 에서 받은 응답의 ok 와 status 를 찍으세요.
-
+    // async function load444() {
+    //   try {
+    //     const res = await fetch("./ghost.json")
+    //     console.log(res.ok, res.status)
+    //     if (!res.ok) {
+    //       throw new Error(`${res.status}`)
+    //       console.log(res.ok);
+    //     }
+    //     const data = await res.json()
+    //     console.log(res.ok);
+    //   } catch (error) {
+    //     console.log(`${error.message}`);
+    //   }
+    // }
+    // $("#load404").addEventListener('click', load444)
 
     // 6-3. 6-1 이 catch 로 넘어가게 고치고, #alarm 에 상태 번호가 들어간
     //      메시지를 띄우세요.
+    async function load444() {
+      try {
+        const res = await fetch("./ghost.json")
+        if (!res.ok) {
+          throw new Error(`${res.status}`)
+        }
+        const data = await res.json()
+        console.log(res.ok);
+      } catch (error) {
+        $("#alarm").textContent = `${error.message}`;
+      }
+    }
+    $("#load404").addEventListener('click', load444)
 
+    // // 6-4. ⭐ 예상 — #loadBroken 에 연결하세요.
+    // async function loadBroken() {
+    //   try {
+    //     const res = await fetch("./broken.json")
+    //     if (!res.ok) {
+    //       throw new Error(`${res.status}`)
+    //     }
+    //     const data = await res.json()
+    //     shelf.textContent = res.ok
+    //   } catch (error) {
+    //     $("#alarm").textContent = `${error.message}`;
+    //   }
+    // }
+    // $("#loadBroken").addEventListener('click', loadBroken)
 
-    // 6-4. ⭐ 예상 — #loadBroken 에 연결하세요.
     //      broken.json 은 파일이 있습니다. res.ok 는 무엇이 나옵니까?
     //      그리고 이건 어디서 터집니까?
-    //      예상:
-    //      실제:
-
+    //      예상: JSON 형식이 유효하지않다고 하겠지?
+    //      실제: 코드로는 구분 못한다.
 
     // 6-5. 6-3 의 코드로 broken.json 을 불러보세요. #alarm 에 뭐가 뜹니까?
     //      404 인지 내용이 깨진 건지 구분할 수 있습니까?
-
+    // 구분이 가능합니다, broken.json 을 고치면 구분 가능함, 고치면 코드가 뜨고 안고치면 json 형식이 깨져있다고 알려줌.  
 
     // 6-6. 두 실패를 구분해서 다른 메시지가 뜨게 하세요.
     //        없는 파일    ->  "파일을 찾을 수 없습니다 (404)"
     //        깨진 파일    ->  "데이터를 읽을 수 없습니다"
-
+    async function loadBroken() {
+      try {
+        const res = await fetch("./broken.json")
+        if (!res.ok) {
+          throw new Error(`${res.status}`)
+        }
+        const data = await res.json()
+      } catch (error) {
+        if (error.message === 404)
+          return $("#alarm").textContent = `파일을 찾을 수 없습니다 (${error.message})`
+        $("#alarm").textContent = "데이터를 읽을 수 없습니다"
+      }
+    }
+    $("#loadBroken").addEventListener('click', loadBroken)
 
     // 6-7. 같은 코드로 books.json 을 불러서 정상 동작하는지 확인하세요.
-
+    async function load() {
+      try {
+        const res = await fetch("./books.json")
+        if (!res.ok) {
+          throw new Error(`${res.status}`)
+        }
+        const data = await res.json()
+        shelf.textContent = res.ok
+      } catch (error) {
+        if (error.message === "404")
+          return $("#alarm").textContent = `파일을 찾을 수 없습니다 (${error.message})`
+        $("#alarm").textContent = "데이터를 읽을 수 없습니다"
+      }
+    }
+    $("#load").addEventListener('click', load)
 
     // ========== PART 7 : 여러 개 한 번에 ==========
 
