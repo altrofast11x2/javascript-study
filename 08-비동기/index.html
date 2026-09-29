@@ -264,12 +264,12 @@
 
 
     // 3-5. 3-4 의 (B) 를 "전부 끝난 뒤에 끝났다는 걸 알 수 있게" 고치세요.
-    const list = [500, 500, 500]
-    async function end(params) {
-      list.forEach(async (ms) => { await delay(ms); console.log("B", ms); })
-      await delay(list.reduce((acc, cur) => acc + cur)); console.log("asd");
-    }
-    end()
+    // const list = [500, 500, 500]
+    // async function end(params) {
+    //   list.forEach(async (ms) => { await delay(ms); console.log("B", ms); })
+    //   await delay(list.reduce((acc, cur) => acc + cur)); console.log("B 끝");
+    // }
+    // end()
 
     // ========== PART 4 : try / catch / finally ==========
 
@@ -354,28 +354,35 @@
 
 
     // 5-4. 도서관 이름과 지점을 꺼내서 "노벨도서관 본관" 으로 찍으세요.
-    async function library() {
-      const res = await fetch("./books.json")
-      const data = await res.json()
-      console.log(`${data.library.name} ${data.library.branch}`);
-    }
-    library()
+    // async function library() {
+    //   const res = await fetch("./books.json")
+    //   const data = await res.json()
+    //   console.log(`${data.library.name} ${data.library.branch}`);
+    // }
+    // library()
 
     // 5-5. 책 제목만 배열로 뽑으세요.
-    async function title_arr() {
-      const res = await fetch("./books.json")
-      const data = await res.json()
-      console.log(data.books.map(e => e.title));
-    }
-    title_arr()
+    // async function title_arr() {
+    //   const res = await fetch("./books.json")
+    //   const data = await res.json()
+    //   console.log(data.books.map(e => e.title));
+    // }
+    // title_arr()
 
     // 5-6. 책마다 "대출 가능 권수" 를 구해서
     //      { title, 가능 } 모양의 배열로 만드세요.
-    
-
+    async function BookLoan() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      data.books.map((e) => console.log(({
+        title: e.title,
+        copies: e.copies.total - e.copies.out ? e.copies : ""
+      })));
+    }
+    BookLoan()
     // 5-7. 대출 가능 권수가 가장 많은 책의 제목을 구하세요.
-
-
+    
+    
     // 5-8. 평점을 배열로 뽑으세요. 평점이 없는 책은 "평점없음" 으로 나와야 합니다.
     //      ⭐ ?? 와 || 를 둘 다 써보고 결과가 왜 다른지 적으세요.
 
