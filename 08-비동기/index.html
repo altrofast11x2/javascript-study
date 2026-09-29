@@ -354,47 +354,79 @@
 
 
     // 5-4. 도서관 이름과 지점을 꺼내서 "노벨도서관 본관" 으로 찍으세요.
-    // async function library() {
-    //   const res = await fetch("./books.json")
-    //   const data = await res.json()
-    //   console.log(`${data.library.name} ${data.library.branch}`);
-    // }
-    // library()
+    async function library() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      console.log(`${data.library.name} ${data.library.branch}`);
+    }
+    library()
 
     // 5-5. 책 제목만 배열로 뽑으세요.
-    // async function title_arr() {
-    //   const res = await fetch("./books.json")
-    //   const data = await res.json()
-    //   console.log(data.books.map(e => e.title));
-    // }
-    // title_arr()
+    async function title_arr() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      console.log(data.books.map(e => e.title));
+    }
+    title_arr()
 
     // 5-6. 책마다 "대출 가능 권수" 를 구해서
     //      { title, 가능 } 모양의 배열로 만드세요.
     async function BookLoan() {
       const res = await fetch("./books.json")
       const data = await res.json()
-      data.books.map((e) => console.log(({
+      const result = data.books.map((e) => ({
         title: e.title,
-        copies: e.copies.total - e.copies.out ? e.copies : ""
-      })));
+        가능: e.copies.total - e.copies.out
+      }));
+      console.log(result);
     }
     BookLoan()
     // 5-7. 대출 가능 권수가 가장 많은 책의 제목을 구하세요.
-    
-    
+    async function MaxBookLoan() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      const result = data.books.reduce((acc, cur) => cur.copies.total - cur.copies.out > acc.copies.total - acc.copies.out ? cur : acc).title
+      console.log(result);
+    }
+    MaxBookLoan()
     // 5-8. 평점을 배열로 뽑으세요. 평점이 없는 책은 "평점없음" 으로 나와야 합니다.
     //      ⭐ ?? 와 || 를 둘 다 써보고 결과가 왜 다른지 적으세요.
-
+    async function rating() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      const result = data.books.map(e => e.rating ?? "평점없음")
+      // const result = data.books.map(e => e.rating || "평점없음")
+      console.log(result);
+    }
+    rating()
+    // 다른게 없습니다..
 
     // 5-9. 태그에 "과학" 이 들어간 책의 제목만 뽑으세요.
-
+    async function sience() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      const result = data.books.filter(e => e.tags.includes("과학")).map(e => e.title)
+      console.log(result);
+    }
+    sience()
 
     // 5-10. 모든 태그를 중복 없이 모아 배열로 만드세요.
-
+    async function all_tags() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      const result = [...new Set(data.books.flatMap(e => e.tags))]
+      console.log(result);
+    }
+    all_tags()
 
     // 5-11. 전체 페이지 수 합계와 평균을 구하세요. 평균은 소수점 없이.
-
+    async function pages() {
+      const res = await fetch("./books.json")
+      const data = await res.json()
+      const result = data.books.reduce((acc, cur) => acc + cur.pages, 0)
+      console.log(result);
+    }
+    pages()
 
     // ========== PART 6 : 실패 ==========
     // ghost.json 은 없습니다. broken.json 은 내용이 깨져 있습니다. 둘 다 건드리지 마세요.
