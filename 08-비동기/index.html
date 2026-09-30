@@ -86,9 +86,8 @@
   </select>
   <label><input type="checkbox" id="onlyIn"> 대출 가능만</label>
   <div id="shelf2"></div>
-
   <script src="../lib.js"></script>
-  <script>
+  <script type="module">
     // ============ 08 : 비동기 (2회차) ============
     //
     // ⚠️ 반드시 Live Server 로 여세요. 파일 더블클릭으로 열면 fetch 가 전부 막힙니다.
@@ -545,30 +544,74 @@
     // 7-1. books.json 과 member.json 을 하나씩 순서대로 await 하고
     //      console.time / console.timeEnd 로 걸린 시간을 재세요.
 
+    // async function members1() {
+    //   console.time("시간");
+    //   const res1 = await fetch("member.json")
+    //   const data1 = await res1.json()
+
+    //   const res2 = await fetch("member.json")
+    //   const data2 = await res2.json()
+    //   console.timeEnd("시간");
+    // }
+    // members1()
 
     // 7-2. 같은 걸 둘이 동시에 출발하도록 바꾸고 시간을 다시 재세요.
-    //      차이가 거의 없으면 왜 그런지 적으세요:
-
+    //      차이가 거의 없으면 왜 그런지 적으세요: Promise 를 pending 받고 동시에 돌리고 위에는 실행하고 밑에꺼를 실행하는 방식이라서 그리고 데이터 크기도 그렇게 크지 않아서 차이가 별로 없음.
+    async function members2() {
+      console.time("시간")
+      const [res1, res2] = await Promise.all([
+        fetch("./member.json"),
+        fetch("./ghost.json")
+      ])
+      const [data1, data2] = await Promise.all([
+        res1.json(),
+        res2.json()
+      ])
+      console.timeEnd("시간")
+    }
+    members2()
 
     // 7-3. #loadBoth 에 연결해서 #view 에 이렇게 보여주세요.
     //        "노벨(정회원) - 보유 8권, 대출 2/5, 연체료 0원"
     //      숫자는 전부 받아온 데이터에서 꺼내세요. 직접 쓰면 안 됩니다.
-
+    // async function userinfo() {
+    //   const res = await fetch("./member.json")
+    //   const data = await res.json()
+    //   $("#view").innerHTML = `<div>${data.name} (${data.grade}) - 보유 ${data.borrowed}, 대출 ${data.borrowed}/${data.limit}, 연체료 ${data.fine}원</div>`
+    // }
+    // $("#loadBoth").addEventListener('click', userinfo)
 
     // 7-4. 회원의 nickname 을 이름 앞에 붙이세요. 없으면 name 을 쓰세요.
     //      member.json 의 nickname 값을 보고, ?? 와 || 중 어느 쪽이 맞는지
-    //      판단해서 쓰고 이유를 적으세요:
-
+    //      판단해서 쓰고 이유를 적으세요: 
+    async function userinfo() {
+      const res = await fetch("./member.json")
+      const data = await res.json()
+      $("#view").innerHTML = `<div>${data.name} (${data.nickname ?? data.name}) (${data.grade}) - 보유 ${data.borrowed}, 대출 ${data.borrowed}/${data.limit}, 연체료 ${data.fine}원</div>`
+    }
+    $("#loadBoth").addEventListener('click', userinfo)
 
     // 7-5. ⭐ 예상 — 동시에 가져오는 둘 중 하나를 ghost.json 으로 바꾸면
     //      성공한 쪽 데이터는 쓸 수 있습니까?
-    //      예상:
-    //      실제:
+    //      예상: Syntax Error
+    //      실제:Uncaught (in promise) SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
 
 
     // 7-6. 7-5 를 "하나가 실패해도 성공한 쪽은 쓸 수 있게" 고치세요.
     //      실패한 건 #alarm 에, 성공한 건 화면에 나와야 합니다.
+    async function test() {
+      const res1 = await fetch("./member.json")
+      const res2 = await fetch("./ghost.json")
+      try {
+        if (!res1.ok) { throw new Error(`데이터 불러오기 실패 ${res1.status}`) }
+        else if (!res2.ok) { throw new Error(`데이터 불러오기 실패 ${res1.status}`) }
+      } catch (error) {
 
+      }
+      const data1 = await res1.json()
+      const data2 = await res2.json()
+    }
+    test()
 
     // 7-7. delay 를 이용해서, 2초 안에 응답이 안 오면 실패로 처리하는
     //      타임아웃을 만드세요. books.json 으로 되는지 확인하고,
@@ -597,7 +640,7 @@
 
 
     // 8-6. ⭐ 연타 문제 — #spam 을 만드세요.
-    //      누를 때마다 "랜덤한 시간(0~1.5초) 뒤에 응답이 오는" 상황을 흉내내서
+    //      누를 때마다 "랜덤한 시간(0~1.5 초) 뒤에 응답이 오는" 상황을 흉내내서
     //      #view 에 몇 번째 요청의 결과인지 찍게 하세요.
     //      빠르게 5번 연타하고 #view 를 보세요. 마지막에 남은 게 5번째입니까?
     //      관찰한 걸 적으세요:
