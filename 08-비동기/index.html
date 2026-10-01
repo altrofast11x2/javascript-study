@@ -466,19 +466,19 @@
 
     // 6-3. 6-1 이 catch 로 넘어가게 고치고, #alarm 에 상태 번호가 들어간
     //      메시지를 띄우세요.
-    async function load444() {
-      try {
-        const res = await fetch("./ghost.json")
-        if (!res.ok) {
-          throw new Error(`${res.status}`)
-        }
-        const data = await res.json()
-        console.log(res.ok);
-      } catch (error) {
-        $("#alarm").textContent = `${error.message}`;
-      }
-    }
-    $("#load404").addEventListener('click', load444)
+    // async function load444() {
+    //   try {
+    //     const res = await fetch("./ghost.json")
+    //     if (!res.ok) {
+    //       throw new Error(`${res.status}`)
+    //     }
+    //     const data = await res.json()
+    //     console.log(res.ok);
+    //   } catch (error) {
+    //     $("#alarm").textContent = `${error.message}`;
+    //   }
+    // }
+    // $("#load404").addEventListener('click', load444)
 
     // // 6-4. ⭐ 예상 — #loadBroken 에 연결하세요.
     // async function loadBroken() {
@@ -507,37 +507,37 @@
     // 6-6. 두 실패를 구분해서 다른 메시지가 뜨게 하세요.
     //        없는 파일    ->  "파일을 찾을 수 없습니다 (404)"
     //        깨진 파일    ->  "데이터를 읽을 수 없습니다"
-    async function loadBroken() {
-      try {
-        const res = await fetch("./broken.json")
-        if (!res.ok) {
-          throw new Error(`${res.status}`)
-        }
-        const data = await res.json()
-      } catch (error) {
-        if (error.message === 404)
-          return $("#alarm").textContent = `파일을 찾을 수 없습니다 (${error.message})`
-        $("#alarm").textContent = "데이터를 읽을 수 없습니다"
-      }
-    }
-    $("#loadBroken").addEventListener('click', loadBroken)
+    // async function loadBroken() {
+    //   try {
+    //     const res = await fetch("./broken.json")
+    //     if (!res.ok) {
+    //       throw new Error(`${res.status}`)
+    //     }
+    //     const data = await res.json()
+    //   } catch (error) {
+    //     if (error.message === 404)
+    //       return $("#alarm").textContent = `파일을 찾을 수 없습니다 (${error.message})`
+    //     $("#alarm").textContent = "데이터를 읽을 수 없습니다"
+    //   }
+    // }
+    // $("#loadBroken").addEventListener('click', loadBroken)
 
     // 6-7. 같은 코드로 books.json 을 불러서 정상 동작하는지 확인하세요.
-    async function load() {
-      try {
-        const res = await fetch("./books.json")
-        if (!res.ok) {
-          throw new Error(`${res.status}`)
-        }
-        const data = await res.json()
-        shelf.textContent = res.ok
-      } catch (error) {
-        if (error.message === "404")
-          return $("#alarm").textContent = `파일을 찾을 수 없습니다 (${error.message})`
-        $("#alarm").textContent = "데이터를 읽을 수 없습니다"
-      }
-    }
-    $("#load").addEventListener('click', load)
+    // async function load() {
+    //   try {
+    //     const res = await fetch("./books.json")
+    //     if (!res.ok) {
+    //       throw new Error(`${res.status}`)
+    //     }
+    //     const data = await res.json()
+    //     shelf.textContent = res.ok
+    //   } catch (error) {
+    //     if (error.message === "404")
+    //       return $("#alarm").textContent = `파일을 찾을 수 없습니다 (${error.message})`
+    //     $("#alarm").textContent = "데이터를 읽을 수 없습니다"
+    //   }
+    // }
+    // $("#load").addEventListener('click', load)
 
     // ========== PART 7 : 여러 개 한 번에 ==========
 
@@ -557,19 +557,19 @@
 
     // 7-2. 같은 걸 둘이 동시에 출발하도록 바꾸고 시간을 다시 재세요.
     //      차이가 거의 없으면 왜 그런지 적으세요: Promise 를 pending 받고 동시에 돌리고 위에는 실행하고 밑에꺼를 실행하는 방식이라서 그리고 데이터 크기도 그렇게 크지 않아서 차이가 별로 없음.
-    async function members2() {
-      console.time("시간")
-      const [res1, res2] = await Promise.all([
-        fetch("./member.json"),
-        fetch("./ghost.json")
-      ])
-      const [data1, data2] = await Promise.all([
-        res1.json(),
-        res2.json()
-      ])
-      console.timeEnd("시간")
-    }
-    members2()
+    // async function members2() {
+    //   console.time("시간")
+    //   const [res1, res2] = await Promise.all([
+    //     fetch("./member.json"),
+    //     fetch("./ghost.json")
+    //   ])
+    //   const [data1, data2] = await Promise.all([
+    //     res1.json(),
+    //     res2.json()
+    //   ])
+    //   console.timeEnd("시간")
+    // }
+    // members2()
 
     // 7-3. #loadBoth 에 연결해서 #view 에 이렇게 보여주세요.
     //        "노벨(정회원) - 보유 8권, 대출 2/5, 연체료 0원"
@@ -583,13 +583,13 @@
 
     // 7-4. 회원의 nickname 을 이름 앞에 붙이세요. 없으면 name 을 쓰세요.
     //      member.json 의 nickname 값을 보고, ?? 와 || 중 어느 쪽이 맞는지
-    //      판단해서 쓰고 이유를 적으세요: 
-    async function userinfo() {
-      const res = await fetch("./member.json")
-      const data = await res.json()
-      $("#view").innerHTML = `<div>${data.name} (${data.nickname ?? data.name}) (${data.grade}) - 보유 ${data.borrowed}, 대출 ${data.borrowed}/${data.limit}, 연체료 ${data.fine}원</div>`
-    }
-    $("#loadBoth").addEventListener('click', userinfo)
+    //      판단해서 쓰고 이유를 적으세요: || 가 맞고  ?? 는 null 을 반환 하니까 || 를 쓴겁니당
+    // async function userinfo() {
+    //   const res = await fetch("./member.json")
+    //   const data = await res.json()
+    //   $("#view").innerHTML = `<div>${data.nickname || data.name} (${data.grade}) - 보유 ${data.borrowed}, 대출 ${data.borrowed}/${data.limit}, 연체료 ${data.fine}원</div>`
+    // }
+    // $("#loadBoth").addEventListener('click', userinfo)
 
     // 7-5. ⭐ 예상 — 동시에 가져오는 둘 중 하나를 ghost.json 으로 바꾸면
     //      성공한 쪽 데이터는 쓸 수 있습니까?
@@ -604,7 +604,7 @@
       const res2 = await fetch("./ghost.json")
       try {
         if (!res1.ok) { throw new Error(`데이터 불러오기 실패 ${res1.status}`) }
-        else if (!res2.ok) { throw new Error(`데이터 불러오기 실패 ${res1.status}`) }
+        else if (!res2.ok) { throw new Error(`데이터 불러오기 실패 ${res2.status}`) }
       } catch (error) {
 
       }
@@ -616,7 +616,22 @@
     // 7-7. delay 를 이용해서, 2초 안에 응답이 안 오면 실패로 처리하는
     //      타임아웃을 만드세요. books.json 으로 되는지 확인하고,
     //      타임아웃을 10ms 로 줄여서 실패하는 것도 확인하세요.
+    async function tester() {
+      try {
+        const res = await Promise.race([
+          fetch("./books.json"),
+          delay(2000).then(() => {
+            throw new Error("타임아웃")
+          })
+        ])
 
+        const data = await res.json()
+        view.textContent = data.books
+      } catch (error) {
+        alarm.textContent = error.message
+      }
+    }
+    // tester()
 
     // ========== PART 8 : 로딩과 렌더 ==========
 
@@ -624,8 +639,31 @@
     //        누른 즉시  ->  #note 에 "불러오는 중..."
     //        다 받으면  ->  #note 를 비우고 #shelf 에 책 카드를 그리기
     //      카드마다 .item 클래스. 제목 / 저자 / 페이지 / 대출가능 권수 / 평점이 보이게.
-    //      평점 없는 책은 "-" 로 표시하세요.
-
+    //      평점 없는 책은 "-" 로 표시하요.
+    let save = []
+    const loader = () => {
+      const layout = (list) => {
+        $("#shelf").innerHTML = list.map((e, i) => `
+      <ul>
+        <li>${e.title}${e.author}${e.pages}${e.copies.total - e.copies.out}${e.rating ?? " - "}</li>
+      </ul>`).join(" / ")
+      }
+      async function loading() {
+        $("#note").textContent = "불러오는 중..."
+        try {
+          const res = await fetch("./books.json")
+          if (!res.ok) throw new Error(`${error.message}`)
+          const data = await res.json()
+          save = data.books
+        } catch (error) {
+          return alert(error.message)
+        } finally {
+          $("#note").textContent = ""
+        }
+      }
+      loading()
+    }
+    $("#load").addEventListener('click', loader)
 
     // 8-2. 대출 가능 권수가 0 인 카드에 "out" 클래스를 붙이세요.
 
