@@ -645,8 +645,8 @@
       const layout = (list) => {
         $("#shelf").innerHTML = list.map((e, i) => `
       <ul>
-        <li>${e.title}${e.author}${e.pages}${e.copies.total - e.copies.out}${e.rating ?? " - "}</li>
-      </ul>`).join(" / ")
+        <li>${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}</li>
+      </ul>`).join("")
       }
       async function loading() {
         $("#note").textContent = "불러오는 중..."
@@ -655,6 +655,7 @@
           if (!res.ok) throw new Error(`${error.message}`)
           const data = await res.json()
           save = data.books
+          layout(save)
         } catch (error) {
           return alert(error.message)
         } finally {
