@@ -466,19 +466,19 @@
 
     // 6-3. 6-1 이 catch 로 넘어가게 고치고, #alarm 에 상태 번호가 들어간
     //      메시지를 띄우세요.
-    // async function load444() {
-    //   try {
-    //     const res = await fetch("./ghost.json")
-    //     if (!res.ok) {
-    //       throw new Error(`${res.status}`)
-    //     }
-    //     const data = await res.json()
-    //     console.log(res.ok);
-    //   } catch (error) {
-    //     $("#alarm").textContent = `${error.message}`;
-    //   }
-    // }
-    // $("#load404").addEventListener('click', load444)
+    async function load444() {
+      try {
+        const res = await fetch("./ghost.json")
+        if (!res.ok) {
+          throw new Error(`${res.status}`)
+        }
+        const data = await res.json()
+        console.log(res.ok);
+      } catch (error) {
+        $("#alarm").textContent = `${error.message}`;
+      }
+    }
+    $("#load404").addEventListener('click', load444)
 
     // // 6-4. ⭐ 예상 — #loadBroken 에 연결하세요.
     // async function loadBroken() {
@@ -640,15 +640,125 @@
     //        다 받으면  ->  #note 를 비우고 #shelf 에 책 카드를 그리기
     //      카드마다 .item 클래스. 제목 / 저자 / 페이지 / 대출가능 권수 / 평점이 보이게.
     //      평점 없는 책은 "-" 로 표시하요.
+    // let save = []
+    // const loader = () => {
+    //   const layout = (list) => {
+    //     $("#shelf").innerHTML = list.map((e, i) => `
+    //   <ul>
+    //     <li>${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}</li>
+    //   </ul>`).join("")
+    //   }
+    //   async function loading() {
+    //     $("#note").textContent = "불러오는 중..."
+    //     try {
+    //       const res = await fetch("./books.json")
+    //       if (!res.ok) throw new Error(`${error.message}`)
+    //       const data = await res.json()
+    //       save = data.books
+    //       layout(save)
+    //     } catch (error) {
+    //       return alert(error.message)
+    //     } finally {
+    //       $("#note").textContent = ""
+    //     }
+    //   }
+    //   loading()
+    // }
+    // $("#load").addEventListener('click', loader)
+
+    // 8-2. 대출 가능 권수가 0 인 카드에 "out" 클래스를 붙이세요.
+    // let save = []
+    // const loader = () => {
+    //   const layout = (list) => {
+    //     $("#shelf").innerHTML = list.map((e, i) => `
+    //     <li class='${(e.copies.total - e.copies.out) || 'out'}'>
+    //       ${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}
+    //     </li>`).join("")
+    //   }
+    //   async function loading() {
+    //     $("#note").textContent = "불러오는 중..."
+    //     try {
+    //       const res = await fetch("./books.json")
+    //       if (!res.ok) throw new Error(`${error.message}`)
+    //       const data = await res.json()
+    //       save = data.books
+    //       layout(save)
+    //     } catch (error) {
+    //       return alert(error.message)
+    //     } finally {
+    //       $("#note").textContent = ""
+    //     }
+    //   }
+    //   loading()
+    // }
+    // $("#load").addEventListener('click', loader)
+
+    // 8-3. 대출 가능 권수가 1 또는 2 인 카드에 "last" 클래스를 붙이세요.
+    // let save = []
+    // const loader = () => {
+    //   const layout = (list) => {
+    //     $("#shelf").innerHTML = list.map((e, i) => `
+    //     <li class='${(e.copies.total - e.copies.out) ? "" : "out" } ${(e.copies.total - e.copies.out) >= 1 && (e.copies.total - e.copies.out) <= 2  ? "last" : ""}'>
+    //       ${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}
+    //     </li>`).join("")
+    //   }
+    //   async function loading() {
+    //     $("#note").textContent = "불러오는 중..."
+    //     try {
+    //       const res = await fetch("./books.json")
+    //       if (!res.ok) throw new Error(`${error.message}`)
+    //       const data = await res.json()
+    //       save = data.books
+    //       layout(save)
+    //     } catch (error) {
+    //       return alert(error.message)
+    //     } finally {
+    //       $("#note").textContent = ""
+    //     }
+    //   }
+    //   loading()
+    // }
+    // $("#load").addEventListener('click', loader)
+
+    // 8-4. #load 를 두 번 누르세요. 뭐가 잘못됐습니까? 고치세요.
+    // let save = []
+    // const loader = () => {
+    //   const layout = (list) => {
+    //     $("#shelf").innerHTML = list.map((e, i) => `
+    //     <li class='${(e.copies.total - e.copies.out) ? "" : "out"} ${(e.copies.total - e.copies.out) >= 1 && (e.copies.total - e.copies.out) <= 2 ? "last" : ""}'>
+    //       ${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}
+    //     </li>`).join("")
+    //   }
+    //   async function loading() {
+    //     if (save.length) return layout(save)
+    //     $("#note").textContent = "불러오는 중..."
+    //     try {
+    //       const res = await fetch("./books.json")
+    //       if (!res.ok) throw new Error(`${error.message}`)
+    //       const data = await res.json()
+    //       save = data.books
+    //       layout(save)
+    //     } catch (error) {
+    //       return alert(error.message)
+    //     } finally {
+    //       $("#note").textContent = ""
+    //     }
+    //   }
+    //   loading()
+    // }
+    // $("#load").addEventListener('click', loader)
+
+    // 8-5. #load404 를 눌렀을 때 #note 가 남지 않게 하세요.
     let save = []
     const loader = () => {
       const layout = (list) => {
         $("#shelf").innerHTML = list.map((e, i) => `
-      <ul>
-        <li>${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}</li>
-      </ul>`).join("")
+        <li class='${(e.copies.total - e.copies.out) ? "" : "out"} ${(e.copies.total - e.copies.out) >= 1 && (e.copies.total - e.copies.out) <= 2 ? "last" : ""}'>
+          ${e.title} / ${e.author} / ${e.pages} / ${e.copies.total - e.copies.out} / ${e.rating ?? " - "}
+        </li>`).join("")
       }
       async function loading() {
+        if (save.length) return layout(save)
         $("#note").textContent = "불러오는 중..."
         try {
           const res = await fetch("./books.json")
@@ -666,24 +776,13 @@
     }
     $("#load").addEventListener('click', loader)
 
-    // 8-2. 대출 가능 권수가 0 인 카드에 "out" 클래스를 붙이세요.
-
-
-    // 8-3. 대출 가능 권수가 1 또는 2 인 카드에 "last" 클래스를 붙이세요.
-
-
-    // 8-4. #load 를 두 번 누르세요. 뭐가 잘못됐습니까? 고치세요.
-
-
-    // 8-5. #load404 를 눌렀을 때 #note 가 남지 않게 하세요.
-
-
     // 8-6. ⭐ 연타 문제 — #spam 을 만드세요.
     //      누를 때마다 "랜덤한 시간(0~1.5 초) 뒤에 응답이 오는" 상황을 흉내내서
     //      #view 에 몇 번째 요청의 결과인지 찍게 하세요.
     //      빠르게 5번 연타하고 #view 를 보세요. 마지막에 남은 게 5번째입니까?
     //      관찰한 걸 적으세요:
-
+    let count = 0
+    
 
     // 8-7. 8-6 을 고치세요. 연타해도 항상 "마지막에 누른 것" 의 결과만
     //      화면에 남아야 합니다.
