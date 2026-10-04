@@ -119,7 +119,37 @@
               천천히 한 글자씩 (0.5초 간격) 치면 5 가 나와야 합니다.
 
        힌트는 없습니다. 대신 쓸 재료만 적어둡니다 — setTimeout / clearTimeout
-
+// let time = null
+    // const delay = (e) => new Promise(resolve => {
+    //   return time = setTimeout(resolve, e);
+    // })
+    // const render = () => {
+    //   let save = []
+    //   const q = $("#q")
+    //   const list = $("#list")
+    //   const count = $("#count").textContent = "1"
+    //   const layout = (bag) => {
+    //     list.innerHTML = bag.map((e, i) =>
+    //       `<div>${e.title} / ${e.author}</div>`
+    //     ).join('')
+    //   }
+    //   async function datas() {
+    //     const res = await fetch("./books.json")
+    //     const data = await res.json()
+    //     save = data.books
+    //     return layout(save)
+    //   }
+    //   datas()
+    //   q.oninput = async () => {
+    //     clearTimeout(time)
+    //     await delay(300)
+    //     count.textContent++
+    //     const search = q.value.trim()
+    //     const result = save.filter(e => e.title.includes(search) || e.author.includes(search))
+    //     layout(result)
+    //   }
+    // }
+    // render()
        ------------------------------------------------------------
        STEP 3 — 상태 보여주기
        ------------------------------------------------------------
@@ -127,7 +157,47 @@
        · 요청 보내는 중               -> #state 에 "검색 중..."
        · 끝나면                       -> #state 에 "N건" (결과 개수)
        · 검색 결과가 0건이면          -> #list 에 "찾는 책이 없습니다"
+    // let time = null
+    // const delay = (e) => new Promise(resolve => {
+    //   return time = setTimeout(resolve, e);
+    // })
+    // const render = () => {
+    //   let save = []
+    //   const q = $("#q")
+    //   const list = $("#list")
+    //   const count = $("#count")
+    //   const state = $("#state")
 
+    //   const layout = (bag) => {
+    //     list.innerHTML = bag.map((e, i) =>
+    //       `<div>${e.title} / ${e.author}</div>`
+    //     ).join('')
+    //   }
+    //   async function datas() {
+    //     const res = await fetch("./books.json")
+    //     const data = await res.json()
+    //     save = data.books
+    //     state.textContent = `찾은건수 (${save.length}) 건`
+    //     return layout(save)
+    //   }
+    //   datas()
+    //   q.oninput = async () => {
+    //     clearTimeout(time)
+    //     state.textContent = '입력 중...'
+    //     await delay(300)
+    //     state.textContent = "검색 중..."
+    //     count.textContent++
+    //     const search = q.value.trim()
+    //     const result = save.filter(e => e.title.includes(search) || e.author.includes(search))
+    //     if (!result.length) {
+    //       list.textContent = `찾는 책이 없습니다`
+    //     } else {
+    //       layout(result)
+    //     }
+    //     state.textContent = `${result.length}건`
+    //   }
+    // }
+    // render()
        ------------------------------------------------------------
        STEP 4 — 빈 검색어 처리
        ------------------------------------------------------------
@@ -154,10 +224,47 @@
 
 
     // 여기부터 작성하세요.
-    //    · #q 에 input 이벤트를 걸고, 칠 때마다 books.json 을 fetch 한다
-    //    · 제목 또는 저자에 검색어가 들어간 책만 #list 에 그린다
-    //    · fetch 를 부를 때마다 #count 의 숫자를 1 올린다
-    
+    let time = null
+    const delay = (e) => new Promise(resolve => {
+      return time = setTimeout(resolve, e);
+    })
+    const render = () => {
+      let save = []
+      const q = $("#q")
+      const list = $("#list")
+      const count = $("#count")
+      const state = $("#state")
+
+      const layout = (bag) => {
+        list.innerHTML = bag.map((e, i) =>
+          `<div>${e.title} / ${e.author}</div>`
+        ).join('')
+      }
+      async function datas() {
+        const res = await fetch("./books.json")
+        const data = await res.json()
+        save = data.books
+        state.textContent = `찾은건수 (${save.length}) 건`
+        return layout(save)
+      }
+      datas()
+      q.oninput = async () => {
+        clearTimeout(time)
+        state.textContent = '입력 중...'
+        await delay(300)
+        state.textContent = "검색 중..."
+        count.textContent++
+        const search = q.value.trim()
+        const result = save.filter(e => e.title.includes(search) || e.author.includes(search))
+        if (!result.length) {
+          list.textContent = `찾는 책이 없습니다`
+        } else {
+          layout(result)
+        }
+        state.textContent = `${result.length}건`
+      }
+    }
+    render()
   </script>
 </body>
 
