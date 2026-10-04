@@ -203,7 +203,59 @@
        ------------------------------------------------------------
        · 검색창을 다 지우면 요청을 보내지 말고 전체를 보여준다
        · (요청 횟수가 안 올라가야 합니다)
+    // let time = null
+    // const delay = (e) => new Promise(resolve => {
+    //   return time = setTimeout(resolve, e);
+    // })
+    // const render = () => {
+    //   let save = []
+    //   const q = $("#q")
+    //   const list = $("#list")
+    //   const count = $("#count")
+    //   const state = $("#state")
+    //   const layout = (bag) => {
+    //     list.innerHTML = bag.map((e, i) =>
+    //       `<div>${e.title} / ${e.author}</div>`
+    //     ).join('')
+    //   }
+    //   async function datas() {
+    //     const res = await fetch("./books.json")
+    //     const data = await res.json()
+    //     save = data.books
+    //     layout(save)
+    //   }
+    //   datas()
 
+    //   q.oninput = async () => {
+    //     clearTimeout(time)
+    //     state.textContent = '입력 중...'
+
+    //     const search = q.value.trim()
+
+    //     if (!search) {
+    //       layout(save)
+    //       state.textContent = `${save.length}건`
+    //       return
+    //     }
+    //     await delay(300)
+    //     state.textContent = "검색 중..."
+
+    //     const res = await fetch("./books.json")
+    //     const data = await res.json()
+    //     save = data.books
+
+    //     count.textContent++
+    //     const result = save.filter(e => e.title.includes(search) || e.author.includes(search))
+
+    //     if (!result.length) {
+    //       list.textContent = `찾는 책이 없습니다`
+    //     } else {
+    //       layout(result)
+    //     }
+    //     return state.textContent = `${result.length}건`
+    //   }
+    // }
+    // render()
        ------------------------------------------------------------
        STEP 5 — 느린 서버 흉내
        ------------------------------------------------------------
@@ -212,8 +264,61 @@
 
        확인:  검색어는 "데미안" 인데 화면에 코스모스가 보이는 순간이 있습니까?
               관찰한 것만 적어두세요. 고치는 건 미션 07 입니다.
-              관찰: ___
+              관찰: 음... 저런 버그가 안생김 ㅎ
+          // let time = null
+    // const delay = (e) => new Promise(resolve => {
+    //   return time = setTimeout(resolve, e);
+    // })
+    // const render = () => {
+    //   let save = []
+    //   const q = $("#q")
+    //   const list = $("#list")
+    //   const count = $("#count")
+    //   const state = $("#state")
+    //   const layout = (bag) => {
+    //     list.innerHTML = bag.map((e, i) =>
+    //       `<div>${e.title} / ${e.author}</div>`
+    //     ).join('')
+    //   }
+    //   async function datas() {
+    //     const res = await fetch("./books.json")
+    //     const data = await res.json()
+    //     save = data.books
+    //     layout(save)
+    //   }
+    //   datas()
 
+    //   q.oninput = async () => {
+    //     clearTimeout(time)
+    //     state.textContent = '입력 중...'
+
+    //     const search = q.value.trim()
+
+    //     if (!search) {
+    //       layout(save)
+    //       state.textContent = `${save.length}건`
+    //       return
+    //     }
+    //     await delay(300)
+    //     state.textContent = "검색 중..."
+
+    //     const res = await fetch("./books.json")
+    //     const data = await res.json()
+    //     save = data.books
+
+    //     count.textContent++
+    //     const result = save.filter(e => e.title.includes(search) || e.author.includes(search))
+
+    //     if (!result.length) {
+    //       list.textContent = `찾는 책이 없습니다`
+    //     } else {
+    //       await delay(800)
+    //       layout(result)
+    //     }
+    //     return state.textContent = `${result.length}건`
+    //   }
+    // }
+    // render()
        ------------------------------------------------------------
        [완성 기준]
          ① 빠르게 쳐도 요청 1번
@@ -234,7 +339,6 @@
       const list = $("#list")
       const count = $("#count")
       const state = $("#state")
-
       const layout = (bag) => {
         list.innerHTML = bag.map((e, i) =>
           `<div>${e.title} / ${e.author}</div>`
@@ -244,24 +348,38 @@
         const res = await fetch("./books.json")
         const data = await res.json()
         save = data.books
-        state.textContent = `찾은건수 (${save.length}) 건`
-        return layout(save)
+        layout(save)
       }
       datas()
+
       q.oninput = async () => {
         clearTimeout(time)
         state.textContent = '입력 중...'
+
+        const search = q.value.trim()
+
+        if (!search) {
+          layout(save)
+          state.textContent = `${save.length}건`
+          return
+        }
         await delay(300)
         state.textContent = "검색 중..."
+
+        const res = await fetch("./books.json")
+        const data = await res.json()
+        save = data.books
+
         count.textContent++
-        const search = q.value.trim()
         const result = save.filter(e => e.title.includes(search) || e.author.includes(search))
+
         if (!result.length) {
           list.textContent = `찾는 책이 없습니다`
         } else {
+          await delay(800)
           layout(result)
         }
-        state.textContent = `${result.length}건`
+        return state.textContent = `${result.length}건`
       }
     }
     render()
