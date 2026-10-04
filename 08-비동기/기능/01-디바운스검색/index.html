@@ -6,15 +6,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>미션 01 - 디바운스 검색</title>
   <style>
-    body { background: #222; color: #fff; font-family: sans-serif; line-height: 1.7; padding: 16px; max-width: 700px; }
-    h2 { margin-top: 28px; border-bottom: 1px solid #555; padding-bottom: 4px; }
-    input { width: 100%; padding: 10px; font-size: 16px; background: #333; color: #fff; border: 1px solid #666; }
-    .row { border-bottom: 1px solid #444; padding: 8px 0; }
-    .row b { color: gold; }
-    .meta { color: #999; font-size: 13px; }
-    #state { color: #8cf; min-height: 24px; }
-    #count { color: tomato; font-weight: bold; }
-    .empty { color: #999; padding: 20px 0; }
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      line-height: 1.7;
+      padding: 16px;
+      max-width: 700px;
+    }
+
+    h2 {
+      margin-top: 28px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #666;
+    }
+
+    .row {
+      border-bottom: 1px solid #444;
+      padding: 8px 0;
+    }
+
+    .row b {
+      color: gold;
+    }
+
+    .meta {
+      color: #999;
+      font-size: 13px;
+    }
+
+    #state {
+      color: #8cf;
+      min-height: 24px;
+    }
+
+    #count {
+      color: tomato;
+      font-weight: bold;
+    }
+
+    .empty {
+      color: #999;
+      padding: 20px 0;
+    }
   </style>
 </head>
 
@@ -47,9 +90,23 @@
        · #q 에 input 이벤트를 걸고, 칠 때마다 books.json 을 fetch 한다
        · 제목 또는 저자에 검색어가 들어간 책만 #list 에 그린다
        · fetch 를 부를 때마다 #count 의 숫자를 1 올린다
-
+        const q = $("#q")
+    const list = $("#list")
+    const count = $("#count")
+    q.addEventListener('input', () => {
+      const render = async () => {
+        const res = await fetch("./books.json")
+        const data = await res.json()
+        const search = q.value.trim()
+        count.textContent++
+        list.innerHTML = data.books.filter(e => e.title.includes(search) || e.author.includes(search)).map((e, i) => `
+        <div>${e.title} ${e.author}</div>`).join('')
+      }
+      render()
+    })
+       
        확인:  "코스모스" 를 빠르게 쳐보세요.
-              #count 가 몇이 됩니까?  ___
+              #count 가 몇이 됩니까?  11
               F12 -> Network 탭에도 books.json 이 그만큼 찍힙니다.
 
        ------------------------------------------------------------
@@ -97,8 +154,10 @@
 
 
     // 여기부터 작성하세요.
-
-
+    //    · #q 에 input 이벤트를 걸고, 칠 때마다 books.json 을 fetch 한다
+    //    · 제목 또는 저자에 검색어가 들어간 책만 #list 에 그린다
+    //    · fetch 를 부를 때마다 #count 의 숫자를 1 올린다
+    
   </script>
 </body>
 
