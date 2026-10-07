@@ -8,12 +8,20 @@
 </head>
 
 <body>
-
+  <style>
+    *{margin: 0;padding: 0;box-sizing: border-box;}
+  </style>
+  <canvas id="canvas" width="400" height="300"></canvas>
 </body>
 <script src="../lib.js"></script>
 <script>
   // ============ 09 - canvas ============
-
+  const ctx = canvas.getContext('2d')
+  const w = canvas.width
+  const h = canvas.height
+  // ctx.fillRect(10,10,w,h) //채운 사각형
+  ctx.strokeRect(10,10,100,100) // 태두리만 있는 사각형
+  // ctx.clearRect(1,1,w,h) // 지우기
 </script>
 
 </html>
