@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 - canvas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #222; color: #fff; font-family: sans-serif; padding: 16px; }
+    canvas { background: #111; border: 1px solid #555; display: block; margin: 12px 0; }
+    button { cursor: pointer; padding: 6px 12px; margin-right: 6px; }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="400" height="300"></canvas>
+
+  <button id="red">빨강</button>
+  <button id="yellow">노랑</button>
+  <button id="green">초록</button>
+  <button id="off">전부 끄기</button>
+</body>
+<script src="../lib.js"></script>
+<script>
+  // ============ 09 - canvas ============
+  const ctx = canvas.getContext('2d')
+  const w = canvas.width
+  const h = canvas.height
+  const rad = e => e * Math.PI / 180
+  ctx.moveTo(w/2,h/2)
+  ctx.arc(w/2,h/2,60,0,rad(90))
+  ctx.fill()
+  /* ============================================================
+     미션 A : 신호등 그리기
+     ============================================================
+
+     최종 목표 — 버튼을 누르면 신호등 불이 바뀌는 화면.
+     거기까지 7단계로 갑니다. 중간에 함정 세 개를 일부러 밟습니다.
+
+     ------------------------------------------------------------
+     STEP 1 — 좌표 감각
+     ------------------------------------------------------------
+     · 네 모서리에 20x20 사각형을 하나씩, 흰색으로
+     · 정중앙에도 20x20 사각형 하나, 빨간색으로
+    
+     확인:  모서리 사각형이 화면 밖으로 안 삐져나가야 합니다.
+            오른쪽 아래 사각형의 x, y 는 무엇입니까?
+            w, h 를 써서 계산하세요. 400, 300 을 직접 쓰지 마세요.
+      ctx.fillStyle='white'
+      ctx.fillRect(0,0,20,20)
+      ctx.fillRect(w - 20,0,20,20)
+      ctx.fillRect(0,h - 20,20,20)
+      ctx.fillRect(w - 20,h - 20,20,20)
+      ctx.fillStyle='red'
+      ctx.fillRect((w / 2) - 10,(h / 2) - 10,20,20)
+     ------------------------------------------------------------
+     STEP 2 — ⭐ 함정 1 : 색은 언제 정하나
+     ------------------------------------------------------------
+     · 사각형을 하나 그린 "다음"에 fillStyle 을 다른 색으로 바꿔보세요
+     · 그 사각형 색이 바뀝니까?
+       예상: 안바뀜.
+       실제: 안바뀜.
+       왜 그런지: 왜냐면 색을 선택하기전에 그려버려서.
+    
+     ------------------------------------------------------------
+     STEP 3 — ⭐ 함정 2 : beginPath
+     ------------------------------------------------------------
+     · 왼쪽 위에서 오른쪽 아래로 선 하나 (흰색)
+     · 오른쪽 위에서 왼쪽 아래로 선 하나 (노란색)
+     · 두 번째 선을 그릴 때 beginPath() 를 "빼고" 해보세요
+
+       예상 (첫 번째 선은 어떻게 됩니까): 둘다 노란색으로 바뀜. 왜냐면 beginPath 로 따로따로 그려서,
+       실제: 둘다 노란색으로 바뀜
+      ctx.beginPath()
+      ctx.strokeStyle='white'
+      ctx.moveTo(0,0)
+      ctx.lineTo(w,h)
+      ctx.stroke()
+    
+      ctx.beginPath()
+      ctx.strokeStyle='yellow'
+      ctx.moveTo(w,0)
+      ctx.lineTo(0,h)
+      ctx.stroke()
+     · 그 다음 beginPath() 를 넣어서 고치세요. X 자가 제대로 나와야 합니다
+
+     ------------------------------------------------------------
+     STEP 4 — ⭐ 함정 3 : 라디안
+     ------------------------------------------------------------
+     · 중앙에 반지름 60 짜리 원을 하나 그리세요
+    ctx.beginPath()
+    ctx.arc(w/2,h/2,60,0,Math.PI * 2)
+    ctx.fill()
+     · 먼저 끝각에 360 을 넣어보세요.  ctx.arc(x, y, 60, 0, 360)
+       예상: 그냥 원이 생길거같다.
+       실제: 그냥 원이긴한데 360도 보다 더 돈 숫자같다.
+
+     · 제대로 된 원이 나오게 고치세요
+     · 도(°)를 넣으면 라디안으로 바꿔주는 함수를 하나 만들어두세요. 뒤에서 씁니다
+      const rad = e => e * Math.PI / 180
+      ctx.beginPath()
+      ctx.arc(w/2,h/2,60,0,rad(360))
+      ctx.fill()
+
+     ------------------------------------------------------------
+     STEP 5 — 반원과 부채꼴
+     ------------------------------------------------------------
+     · 위쪽 반원만 그리기 (채우기)
+     · 90도짜리 부채꼴 그리기 (피자 조각 모양. 중심에서부터 채워져야 합니다)
+
+     힌트 없음. 재료만 — arc 앞에 moveTo 를 쓰면 중심과 이어집니다
+     const rad = e => e * Math.PI / 180
+     ctx.moveTo(w/2,h/2)
+     ctx.arc(w/2,h/2,60,0,rad(90))
+     ctx.fill()
+
+     ------------------------------------------------------------
+     STEP 6 — 신호등 그리기   (새 문법 없음. 1~5 에서 한 것만 씁니다)
+     ------------------------------------------------------------
+
+     6-1. 몸통만 그리기
+          가운데에 회색 사각형 하나. 가로 90, 세로 230.
+          fillRect 한 줄입니다. STEP 1 과 같아요.
+          x 는 "가운데" 니까 w 로 계산하세요.
+
+     6-2. 불 하나만 그리기
+          몸통 맨 위쪽에 반지름 30 짜리 원 하나. 색은 #333 (꺼진 색).
+          STEP 4 에서 한 arc 그대로입니다.
+
+     6-3. 불 세 개로 늘리기
+          6-2 를 복사해서 y 만 바꿔 세 개. 일단 복붙해도 됩니다.
+          세로로 겹치지 않게 간격을 잡으세요.
+
+     6-4. 복붙한 걸 함수로 묶기
+          6-3 의 세 줄이 y 와 색만 다를 겁니다. 그 두 개를 매개변수로.
+            light(y, 색)
+          그리고 세 번 부르세요. 결과는 6-3 과 똑같아야 합니다.
+
+     6-5. 켜짐/꺼짐 붙이기
+          light 에 세 번째 매개변수를 하나 더.
+            light(y, 색, 켜짐여부)
+          켜졌으면 제 색, 꺼졌으면 #333.
+          지금은 전부 꺼진 상태로 세 번 부르세요.
+
+     6-6. 라벨
+          몸통 아래에 "신호등" 글자. 가운데 정렬.
+          font 와 textAlign 을 쓰세요. (글꼴까지 적어야 먹습니다)
+
+     확인:  회색 몸통 + 어두운 불 3개 + 글자.
+            이 시점엔 아직 버튼을 안 눌러도 됩니다
+      ctx.fillRect(w / 2 - 45, h / 2 - 115, 90, 230)
+      function light(y,c,t) {
+        ctx.beginPath()
+        t ? ctx.fillStyle=c : ctx.fillStyle="#333"
+        ctx.arc(w / 2, h / 2 - y,30,0,rad(360))
+        ctx.fill()
+      }
+      light(70, 'red',false)
+      light(0, 'yellow',false)
+      light(-70, 'green',false)
+        
+     ------------------------------------------------------------
+     STEP 7 — 버튼으로 불 바꾸기
+     ------------------------------------------------------------
+     · 지금 켜진 불이 뭔지 기억하는 변수를 하나 두세요
+     · 버튼 4개(#red #yellow #green #off)를 누르면 그 변수가 바뀌고,
+       화면이 다시 그려져야 합니다
+
+     ⚠️ canvas 는 그린 걸 나중에 못 고칩니다.
+        "불만 바꾸기" 가 아니라 "전부 지우고 처음부터 다시 그리기" 입니다
+
+     확인:  빨강 -> 초록 -> 전부 끄기 를 눌렀을 때
+            이전 불이 남아있으면 안 됩니다
+    const ctx = canvas.getContext('2d')
+    const w = canvas.width
+    const h = canvas.height
+    const rad = e => e * Math.PI / 180
+
+    let state = ''
+
+    function light(y, c, on) {
+      ctx.beginPath()
+      ctx.fillStyle = on ? c : '#333'
+      ctx.arc(w / 2, h / 2 - y, 30, 0, rad(360))
+      ctx.fill()
+    }
+
+    const render = () => {
+      ctx.clearRect(0, 0, w, h)
+      ctx.fillStyle = '#888'
+      ctx.fillRect(w / 2 - 45, h / 2 - 115, 90, 230)
+      light(70, 'red', state === 'red')
+      light(0, 'yellow', state === 'yellow')
+      light(-70, 'green', state === 'green')
+      ctx.fillStyle = 'white'
+      ctx.font = '16px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('신호등', w / 2, h / 2 + 145)
+    }
+
+    red.onclick = () => { state = 'red'; render() }
+    yellow.onclick = () => { state = 'yellow'; render() }
+    green.onclick = () => { state = 'green'; render() }
+    off.onclick = () => { state = ''; render() }
+
+    render()
+     ------------------------------------------------------------
+     [완성 기준]
+       ① 버튼 누르면 해당 불만 켜짐
+       ② 이전 불이 안 남음
+       ③ 400, 300 을 코드에 직접 쓴 곳이 없음 (w, h 사용)
+       ④ 함정 3개의 예상/실제가 주석에 적혀 있음
+     ============================================================ */
+
+
+  // 여기부터 작성하세요.
+
+
+</script>
+
+</html>
