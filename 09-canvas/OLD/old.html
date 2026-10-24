@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 40px;
+        min-height: 100vh;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    canvas {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+    }
+</style>
+
+<body>
+    <div>
+        <h1>바</h1>
+        <canvas id="Bar" width="500" height="500"></canvas>
+    </div>
+    <div>
+        <h1>선</h1>
+        <canvas id="Line" width="500" height="500"></canvas>
+    </div>
+    <div>
+        <h1>파이</h1>
+        <canvas id="Pi" width="500" height="500"></canvas>
+    </div>
+    <div>
+        <h1>도넛</h1>
+        <canvas id="Doughnut" width="500" height="500"></canvas>
+    </div>
+    <div>
+        <h1>로즈</h1>
+        <canvas id="rose" width="500" height="500"></canvas>
+    </div>
+    <div>
+        <h1>다각형</h1>
+        <canvas id="rect" width="500" height="500"></canvas>
+    </div>
+</body>
+<script src="../lib.js"></script>
+<script>
+    const ctx1 = Bar.getContext('2d')
+    const ctx2 = Pi.getContext('2d')
+    const ctx3 = Doughnut.getContext('2d')
+    const ctx4 = rose.getContext('2d')
+    const ctx5 = rect.getContext('2d')
+    const ctx6 = Line.getContext('2d')
+
+    function easeing(t) {
+        return 1 - Math.pow(1 - t, 3)
+    }
+
+    fetch("./data.json").then(r => r.json()).then(json => {
+        const values1 = json.monthlySales.values
+        const values2 = json.studentScores.values
+        const values3 = json.websiteVisitors.values
+        const values4 = json.popularLanguages.values
+        const values5 = json.popularLanguages.values
+
+        const labels1 = json.monthlySales.labels
+        const labels2 = json.studentScores.labels
+        const labels3 = json.websiteVisitors.labels
+        const labels4 = json.popularLanguages.labels
+        const labels5 = json.popularLanguages.labels
+
+        let progress = 0
+
+        // Bar
+        function Bars() {
+
+            let
+                gap = 10,
+                padding = 20
+
+            const
+                W = Bar.width,
+                H = Bar.height,
+                InnerW = W - padding * 2,
+                TotalGap = (values1.length - 1) * gap,
+                BarWidth = (InnerW - TotalGap) / values1.length,
+                Scale = (H - padding * 2) / Math.max(...values1)
+
+
+
+            ctx1.clearRect(0, 0, W, H)
+            const eased = easeing(progress)
+            values1.forEach((value, i) => {
+                const BarH = Scale * value * eased
+
+                ctx1.fillRect(padding + i * (BarWidth + gap), H - BarH, BarWidth, BarH)
+            });
+            if (progress < 1) {
+                progress += 0.002
+                requestAnimationFrame(Bars)
+            }
+        }
+        Bars()
+
+        // PI
+        function Pis() {
+
+            const
+                W = Pi.width,
+                H = Pi.height,
+                S = W / 2,
+                X = H / 2,
+                Total = values2.reduce((s, e) => s + e, 0)
+
+            let
+                R = 200,
+                startAngle = -Math.PI / 2
+
+            ctx2.clearRect(0, 0, W, H)
+            const eased = easeing(progress)
+
+            values2.forEach((value, i) => {
+
+                const sliceAngle = (value / Total) * Math.PI * 2
+                const endAngle = startAngle + sliceAngle * eased
+
+                ctx2.beginPath()
+                ctx2.moveTo(S, X)
+                ctx2.arc(S, X, R, startAngle, endAngle)
+                ctx2.fill()
+                startAngle = endAngle
+            });
+            if (progress < 1) {
+                progress += 0.002
+                requestAnimationFrame(Pis)
+            }
+        }
+        Pis()
+
+        // Doughnut
+        function doughnut() {
+
+            const
+                W = Doughnut.width,
+                H = Doughnut.height,
+                S = W / 2,
+                X = H / 2,
+                InnerR = 100,
+                OuterR = 200,
+                Total = values3.reduce((s, e) => s + e, 0)
+
+            let
+                startAngle = -Math.PI / 2
+
+            ctx3.clearRect(0, 0, W, H)
+            const eased = easeing(progress)
+
+            values3.forEach((value, i) => {
+
+                const sliceAngle = (value / Total) * Math.PI * 2
+                const endAngle = startAngle + sliceAngle * eased
+
+                ctx3.beginPath()
+                ctx3.moveTo(S, X)
+                ctx3.arc(S, X, OuterR, startAngle, endAngle, false)
+                ctx3.arc(S, X, InnerR, endAngle, startAngle, true)
+                ctx3.fill()
+
+                startAngle = endAngle
+            });
+            if (progress < 1) {
+                progress += 0.002
+                requestAnimationFrame(doughnut)
+            }
+        }
+        doughnut()
+
+        // Rose
+        function Rose() {
+
+            const
+                W = Pi.width,
+                H = Pi.height,
+                S = W / 2,
+                X = H / 2,
+                MarR = Math.min(W, H) / 2 - 40,
+                Max = Math.max(...values5),
+                Scale = MarR / Max
+
+            let
+                startAngle = -Math.PI / 2
+
+            ctx4.clearRect(0, 0, W, H)
+            const eased = easeing(progress)
+
+            values4.forEach((value, i) => {
+                sliceAngle = (Math.PI * 2) / values5.length
+                const R = value * Scale
+                const endAngle = startAngle + sliceAngle * eased
+
+                ctx4.beginPath()
+                ctx4.moveTo(S, X)
+                ctx4.arc(S, X, R, startAngle, endAngle)
+                ctx4.fill()
+
+                startAngle = endAngle
+            });
+            if (progress < 1) {
+                progress += 0.002
+                requestAnimationFrame(Rose)
+            }
+        }
+        Rose()
+
+        // Rectangle
+        function Rects() {
+
+            const
+                W = rect.width,
+                H = rect.height,
+                N = values5.length,
+                CX = W / 2,
+                CY = H / 2,
+                MaxR = Math.min(W, H) / 2 - 40,
+                Max = Math.max(...values5),
+                Scale = MaxR / Max,
+                Step = (Math.PI * 2) / N
+
+            ctx5.clearRect(0, 0, W, H)
+            const eased = easeing(progress)
+
+
+            for (let lv = 1; lv <= 4; lv++) {
+                ctx5.beginPath()
+                for (let i = 0; i < N; i++) {
+                    const
+                        Angle = -Math.PI / 2 + i * Step,
+                        R = MaxR * (lv / 4),
+                        X = CX + Math.cos(Angle) * R,
+                        Y = CY + Math.sin(Angle) * R
+
+                    if (i === 0) ctx5.moveTo(X, Y)
+                    else ctx5.lineTo(X, Y)
+                }
+                ctx5.closePath()
+                ctx5.stroke()
+            }
+            for (let i = 0; i < N; i++) {
+                const Angle = -Math.PI / 2 + i * Step
+                ctx5.beginPath()
+                ctx5.moveTo(CX, CY)
+                ctx5.lineTo(CX + Math.cos(Angle) * MaxR, CY + Math.sin(Angle) * MaxR)
+                ctx5.closePath()
+                ctx5.stroke()
+            }
+
+            ctx5.beginPath()
+            values5.forEach((value, i) => {
+                const
+                    Angle = -Math.PI / 2 + i * Step,
+                    R = value * Scale * eased,
+                    X = CX + Math.cos(Angle) * R,
+                    Y = CY + Math.sin(Angle) * R
+
+                if (i == 0) ctx5.moveTo(X, Y)
+                else ctx5.lineTo(X, Y)
+            });
+            ctx5.closePath()
+            ctx5.fillStyle = 'rgba(0, 0, 0, 0.4)'
+            ctx5.fill()
+            ctx5.stroke()
+            if (progress < 1) {
+                progress += 0.002
+                requestAnimationFrame(Rects)
+            }
+        }
+        Rects()
+
+        // Line
+        function Lines() {
+
+            let
+                gap = 10,
+                padding = 20
+
+            const
+                W = Line.width,
+                H = Line.height,
+                InnerW = W - padding * 2,
+                TotalGap = (values1.length - 1) * gap,
+                BarWidth = (InnerW - TotalGap) / values1.length,
+                Scale = (H - padding * 2) / Math.max(...values1)
+
+
+
+            ctx6.clearRect(0, 0, W, H)
+            const eased = easeing(progress)
+            values1.forEach((value, i) => {
+                const BarH = Scale * value
+                if (i == 0) {
+                    ctx6.beginPath()
+                    ctx6.moveTo(padding + i * (BarWidth + gap) + BarWidth / 2, H - BarH * eased)
+                } else {
+                    ctx6.lineTo(padding + i * (BarWidth + gap) + BarWidth / 2, H - BarH * eased)
+                }
+                ctx6.lineWidth = 2.5
+                ctx6.stroke()
+            });
+            values1.forEach((value, i) => {
+                const BarH = Scale * value
+                ctx6.beginPath()
+                ctx6.arc(padding + i * (BarWidth + gap) + BarWidth / 2, H - BarH * eased, 5, 0, Math.PI * 2)
+                ctx6.fill()
+            });
+
+            if (progress < 1) {
+                progress += 0.002
+                requestAnimationFrame(Lines)
+            }
+        }
+        Lines()
+    })
+
+
+</script>
+
+</html>

@@ -5,148 +5,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>09 - canvas</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #222; color: #fff; font-family: sans-serif; padding: 16px; }
-    canvas { background: #111; border: 1px solid #555; display: block; margin: 12px 0; }
-    button { cursor: pointer; padding: 6px 12px; margin-right: 6px; }
-    #note { color: #8cf; min-height: 24px; }
-    #alarm { color: tomato; min-height: 24px; }
-  </style>
 </head>
 
 <body>
+  <style>
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+  <h1 id="title">DAY VISITS</h1>
   <canvas id="canvas" width="520" height="320"></canvas>
-
-  <button id="y2024">2024</button>
-  <button id="y2025">2025</button>
-  <button id="bad">없는 파일</button>
+  <button id="b1">PC</button>
+  <button id="b2">MOBILE</button>
   <p id="note"></p>
-  <p id="alarm"></p>
 </body>
 <script src="../lib.js"></script>
 <script>
-  // ============ 09 - canvas : 막대그래프 ============
+  // ============ 09 - canvas ============
   const ctx = canvas.getContext('2d')
-  const w = canvas.width
-  const h = canvas.height
+  const cw = canvas.width
+  const ch = canvas.height
+  function easeing(t) {
+    return 1 - Math.pow(1 - t, 3)
+  }
+  let progress = 0
+  let animationId
 
-  /* ============================================================
-     미션 B : 매출 막대그래프
-     ============================================================
+  fetch("./data.json").then(r => {
+    if (!r.ok) throw new Error("Faild to Fetch Data");
+    return r.json()
+  }).then(json => {
 
-     최종 목표 — sales.json 을 받아와서 월별 매출을 막대그래프로 그리고,
-                버튼으로 연도를 바꿀 수 있는 화면.
+    // datas
+    const
+      day = json.visits.map(e => e.day),
+      pc = json.visits.map(e => e.pc),
+      mobile = json.visits.map(e => e.mobile)
 
-     데이터 : sales.json
-              { unit: "만원", years: { "2024": [12개], "2025": [12개] } }
+    function bars(data) {
+      // animation reset
+      cancelAnimationFrame(animationId)
+      let progress = 0
 
-     ------------------------------------------------------------
-     STEP 1 — ⭐ 함정 : 데이터가 오기 전에 그리면
-     ------------------------------------------------------------
-     · sales.json 을 fetch 하는 함수를 만들고, 받아온 걸 변수에 담으세요.
-     · 그 "바로 다음 줄"에서 변수를 찍어보세요. await 를 쓰지 말고요.
-
-       예상:
-       실제:
-       왜 그런지:
-
-     · 그 다음 제대로 고치세요.
-
-     ------------------------------------------------------------
-     STEP 2 — 그릴 자리 정하기
-     ------------------------------------------------------------
-     그래프는 캔버스를 꽉 채우지 않습니다. 가장자리에 여백이 필요해요.
-     (왼쪽엔 숫자, 아래쪽엔 월 이름이 들어갈 자리)
-
-     · 여백을 변수로 정하세요.  예) padL, padR, padT, padB
-     · 그래프가 실제로 그려질 영역의 가로/세로를 계산하세요.
-     · 바닥선(x축)과 왼쪽선(y축)을 선으로 그으세요.
-
-     확인:  선이 캔버스 가장자리에서 떨어져 있어야 합니다.
-            520, 320 을 직접 쓰지 말고 w, h 로 계산하세요.
-
-     ------------------------------------------------------------
-     STEP 3 — 막대 하나
-     ------------------------------------------------------------
-     1월 값 하나만 막대로 그리세요.
-
-     · 막대 높이는 값에 비례해야 합니다.
-       "가장 큰 값"이 그래프 영역을 꽉 채우도록 잡으세요.
-       (값 120 이 몇 픽셀이 되어야 하는지 식을 세우는 게 이 단계의 전부입니다)
-
-     확인:  최댓값인 달의 막대가 위쪽 여백에 닿을락 말락 해야 합니다.
-
-     ------------------------------------------------------------
-     STEP 4 — ⭐ 함정 : 막대가 어느 쪽으로 자라나
-     ------------------------------------------------------------
-     · fillRect 의 y 에 "높이" 를 그대로 넣어보세요.
-
-       예상 (막대가 어디서 어디로 자랄까요):
-       실제:
-       왜 그런지:
-
-     · 바닥에서 위로 자라게 고치세요.
-
-     ------------------------------------------------------------
-     STEP 5 — 막대 12개
-     ------------------------------------------------------------
-     · 12개를 가로로 나란히 그리세요.
-     · 몇 번째 막대인지(index)로 x 를 계산하세요.
-     · 막대 사이에 간격이 있어야 합니다. 붙어 있으면 안 됩니다.
-
-     확인:  오른쪽 끝 막대가 오른쪽 여백 안에 들어와야 합니다.
-
-     ------------------------------------------------------------
-     STEP 6 — 글자
-     ------------------------------------------------------------
-     · 각 막대 아래에 월 이름 (1월 ~ 12월, 또는 1 ~ 12)
-     · 각 막대 위에 그 달의 값
-     · 왼쪽 y축에 눈금 숫자 3~5개 (0 과 최댓값은 꼭)
-
-     확인:  글자가 막대와 겹치지 않아야 합니다.
-
-     ------------------------------------------------------------
-     STEP 7 — 최댓값 강조
-     ------------------------------------------------------------
-     · 그 해 최댓값인 달의 막대만 다른 색으로 그리세요.
-     · 어느 달인지는 코드가 찾아야 합니다. 직접 적어두지 마세요.
-
-     확인:  2024 는 12월, 2025 는 8월이 강조돼야 합니다.
-
-     ------------------------------------------------------------
-     STEP 8 — 연도 바꾸기
-     ------------------------------------------------------------
-     · #y2024 #y2025 를 누르면 그 해 그래프로 바뀌어야 합니다.
-     · 버튼을 누를 때마다 fetch 가 다시 나가면 안 됩니다.
-       (F12 -> Network 탭에서 sales.json 이 한 번만 떠야 합니다)
-
-     ⚠️ 2025(최대 460) 를 보다가 2024(최대 330) 로 가면
-        눈금 숫자와 막대 높이가 둘 다 바뀌어야 맞습니다.
-
-     ------------------------------------------------------------
-     STEP 9 — 로딩과 실패
-     ------------------------------------------------------------
-     · 받아오는 동안 #note 에 "불러오는 중..."
-     · 다 그리면 #note 를 비우기
-     · #bad 를 누르면 없는 파일을 불러서 #alarm 에 실패 메시지
-     · 실패해도 #note 가 남으면 안 됩니다
-
-     ------------------------------------------------------------
-     [완성 기준]
-       ① 연도 버튼으로 그래프가 바뀐다
-       ② 최댓값 막대가 강조된다 (2024=12월, 2025=8월)
-       ③ 막대가 바닥에서 위로 자란다
-       ④ 눈금·월이름·값이 겹치지 않고 보인다
-       ⑤ fetch 는 한 번만 나간다
-       ⑥ 520, 320 을 직접 쓴 곳이 없다
-       ⑦ 함정 2개의 예상/실제가 적혀 있다
-     ============================================================ */
-
-
-  // 여기부터 작성하세요.
-
-
+      // animating
+      function draw() {
+        ctx.clearRect(0, 0, cw, ch)
+        progress = Math.min(progress + 0.002, 1)
+        const eased = easeing(progress)
+        const gap = 20, padding = 20
+        const barW = (cw - padding * 2 - (data.length - 1) * gap) / data.length
+        const scale = (ch - padding * 2) / Math.max(...data)
+        pc.forEach((v, i) => {
+          const barH = scale * v * eased
+          ctx.fillRect(padding + i * (barW + gap), ch - padding - barH, barW, barH)
+        });
+        if (progress < 1) requestAnimationFrame(draw)
+      }
+      draw()
+    }
+    b1.addEventListener('click', () => bars(pc))
+    b2.addEventListener('click', () => bars(mobile))
+    bars(pc)
+  })
 </script>
 
 </html>
