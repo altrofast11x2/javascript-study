@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 100vh;
+    }
+  </style>
+  <canvas id="c" width="800" height="400"></canvas>
+  <script>
+    const ctx = c.getContext('2d')
+    const
+      w = c.width,
+      h = c.height
+    function easing(t) {
+      return 1 - Math.pow(1 - t, 3)
+    }
+    fetch("./data.json").then(r => {
+      if (!r.ok) throw new Error("Failed To Fetch Error");
+      return r.json()
+    }).then(json => {
+      // data
+      const
+        label = json.scores.map(e => e.name),
+        data = json.scores.map(e => e.math)
+      let progress = 0
+      function bars() {
+        ctx.clearRect(0, 0, w, h)
+        progress = Math.min(progress + 0.002, 1)
+        const eased = easing(progress)
+        let
+          gap = 20,
+          padding = 20
+        const
+          barW = (w - padding * 2 - (data.length - 1) * gap) / data.length,
+          scale = (h - padding * 2) / Math.max(...data)
+        ctx.beginPath()
+        data.forEach((value, i) => {
+          const barH = scale * value * eased
+          const
+            x = padding + i * (barW + gap) + barW / 2,
+            y = h - padding - barH
+          if (i === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
+          ctx.fillRect(padding + i * (barW + gap), y, barW, barH)
+          ctx.arc(x, y, 10, 0, Math.PI * 2)
+        });
+        ctx.stroke()
+        if (progress < 1) requestAnimationFrame(bars)
+      }
+      bars()
+    })
+  </script>
+</body>
+
+</html>
