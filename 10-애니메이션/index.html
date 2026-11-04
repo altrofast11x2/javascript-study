@@ -266,9 +266,14 @@
      · #start 시작 / #stop 정지 / #reset 처음 위치로 되돌리고 정지
 
      · (함정) #start 를 세 번 연속 누르세요.
-       예상:
-       실제:
-       왜 그런지:
+       예상: 루프가 여러 개 돌아서 공이 빨라질 것 같다.
+       실제: 루프가 3개 돌아서 공이 3배로 빨라졌다.
+             (1초간 ctx.arc 호출 수를 세보니  1번 눌렀을 때 1 / 3번 눌렀을 때 3)
+       왜 그런지: rafId 는 loop 이 한 번이라도 실행돼야 값이 들어간다.
+                 클릭 세 번은 loop 이 돌기 전, 같은 틱 안에서 다 끝난다.
+                 그래서 세 번 다 rafId 가 아직 null 이고 가드를 그냥 통과한다.
+                 -> start 안에서 requestAnimationFrame 의 반환값을
+                    바로 rafId 에 담아야 한다.
 
      · 몇 번 눌러도 하나만 돌게 고치세요.
 
@@ -292,11 +297,11 @@
     ctx.fill()
     ctx.closePath()
   }
-  let prev = 0
+  let prev = null          // 0 이 아니라 null : "아직 모른다"
   let count = 0
   let rafId = null
   function loop(now) {
-    const dt = (now - prev) / 1000
+    const dt = prev === null ? 0 : (now - prev) / 1000   // 첫 프레임은 0초
     prev = now
     ctx.clearRect(0, 0, w, h)
     b.x += b.vx * dt
@@ -316,6 +321,7 @@
   }
   $("#start").onclick = () => {
     if (rafId !== null) return
+    prev = null            // 쉬었던 시간이 dt 로 들어오지 않게
     rafId = requestAnimationFrame(loop)
   }
   $("#stop").onclick = () => {
@@ -325,6 +331,7 @@
   $("#reset").onclick = () => {
     cancelAnimationFrame(rafId)
     rafId = null
+    prev = null            // 여기도 같이
     b.x = w / 2
     b.y = h / 2
     ctx.clearRect(0, 0, w, h)
@@ -539,7 +546,7 @@
 
   //      확인 : #reset 을 연타해도 깨지지 않아야 합니다.
   //             자라는 시간을 재보세요. 0.8초가 맞습니까?
-  // let prev = 0
+  // let prev = null        // 0 대신 null
   // let progress = 0
   // let rAF = null
   // function easing(t) {
@@ -555,10 +562,10 @@
   //     const
   //       BarW = (w - padding * 2 - (math.length - 1) * gap) / math.length,
   //       Scale = (h - padding * 2) / Math.max(...math),
-  //       eased = easing(progress),
-  //       dt = prev === 0 ? 0 : (now - prev) / 1000
+  //       dt = prev === null ? 0 : (now - prev) / 1000
   //     prev = now
   //     progress = Math.min(progress + dt / .8, 1);
+  //     const eased = easing(progress)   // progress 를 갱신한 "뒤에" 계산
   //     ctx.clearRect(0, 0, w, h)
   //     math.forEach((value, i) => {
   //       const barH = Scale * value * eased
@@ -568,10 +575,10 @@
 
   //     if (progress < 1) rAF = requestAnimationFrame(bar)
   //   }
-  //   requestAnimationFrame(bar)
+  //   rAF = requestAnimationFrame(bar)     // 첫 발사도 id 를 담는다
   //   $("#reset").onclick = () => {
   //     cancelAnimationFrame(rAF)
-  //     prev = 0
+  //     prev = null
   //     progress = 0
   //     rAF = requestAnimationFrame(bar);
   //   }
