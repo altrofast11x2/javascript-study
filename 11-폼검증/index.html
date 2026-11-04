@@ -5,14 +5,317 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>11 - 폼 검증</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #222; color: #eee; font-family: sans-serif; padding: 20px; }
+    form { max-width: 420px; }
+    h1 { font-size: 20px; margin-bottom: 16px; }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 13px; margin-bottom: 4px; color: #aaa; }
+    input[type=text], input[type=email], input[type=password],
+    input[type=number], select {
+      width: 100%; padding: 8px; background: #111; color: #eee;
+      border: 1px solid #555; border-radius: 4px;
+    }
+    input:focus, select:focus { outline: none; border-color: #8cf; }
+    .err { color: #f66; font-size: 12px; min-height: 16px; margin-top: 3px; }
+    input.invalid, select.invalid { border-color: #f66; }
+    .ok { color: #6d6; }
+    .group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .group label { display: flex; align-items: center; gap: 4px; color: #eee; margin: 0; }
+    .group input { width: auto; }
+    button { padding: 8px 16px; margin-top: 8px; margin-right: 6px; cursor: pointer; }
+    #out { background: #111; border: 1px solid #555; padding: 10px; margin-top: 16px;
+           white-space: pre-wrap; font-size: 13px; color: #8cf; min-height: 40px; }
+  </style>
 </head>
 
 <body>
+  <h1>회원가입</h1>
 
+  <form id="f">
+    <div class="field">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" placeholder="홍길동">
+      <p class="err" data-for="name"></p>
+    </div>
+
+    <div class="field">
+      <label for="userid">아이디</label>
+      <input type="text" id="userid" name="userid" placeholder="영문+숫자 4~12자">
+      <p class="err" data-for="userid"></p>
+    </div>
+
+    <div class="field">
+      <label for="email">이메일</label>
+      <input type="text" id="email" name="email" placeholder="me@example.com">
+      <p class="err" data-for="email"></p>
+    </div>
+
+    <div class="field">
+      <label for="pw">비밀번호</label>
+      <input type="password" id="pw" name="pw" placeholder="영문+숫자+특수문자 8자 이상">
+      <p class="err" data-for="pw"></p>
+    </div>
+
+    <div class="field">
+      <label for="pw2">비밀번호 확인</label>
+      <input type="password" id="pw2" name="pw2">
+      <p class="err" data-for="pw2"></p>
+    </div>
+
+    <div class="field">
+      <label for="age">나이</label>
+      <input type="text" id="age" name="age" placeholder="숫자만">
+      <p class="err" data-for="age"></p>
+    </div>
+
+    <div class="field">
+      <label for="region">지역</label>
+      <select id="region" name="region">
+        <option value="">선택하세요</option>
+        <option value="seoul">서울</option>
+        <option value="busan">부산</option>
+        <option value="daegu">대구</option>
+        <option value="incheon">인천</option>
+        <option value="gwangju">광주</option>
+      </select>
+      <p class="err" data-for="region"></p>
+    </div>
+
+    <div class="field">
+      <label>관심사 (1개 이상)</label>
+      <div class="group">
+        <label><input type="checkbox" name="hobby" value="coding"> 코딩</label>
+        <label><input type="checkbox" name="hobby" value="music"> 음악</label>
+        <label><input type="checkbox" name="hobby" value="game"> 게임</label>
+        <label><input type="checkbox" name="hobby" value="sport"> 운동</label>
+      </div>
+      <p class="err" data-for="hobby"></p>
+    </div>
+
+    <div class="field">
+      <div class="group">
+        <label><input type="checkbox" id="agree" name="agree"> 약관에 동의합니다</label>
+      </div>
+      <p class="err" data-for="agree"></p>
+    </div>
+
+    <button id="send">가입하기</button>
+    <button id="fill">예시값 채우기</button>
+  </form>
+
+  <div id="out"></div>
 </body>
 <script src="../lib.js"></script>
 <script>
   // ============ 11 - 폼 검증 ============
+
+  /* ============================================================
+     미션 : 회원가입 폼 검증
+
+     화면 요소   폼 #f  /  버튼 #send #fill  /  결과 출력 #out
+                 칸    #name #userid #email #pw #pw2 #age #region
+                       name="hobby" 체크박스 4개  /  #agree
+                 에러칸 <p class="err" data-for="칸이름"></p>  (이미 다 있습니다)
+     데이터      users.json  (이미 가입된 아이디 목록)
+
+     STEP 하나씩 하고 보여주세요. 한 번에 다 하면 어디서 틀렸는지 못 찾습니다.
+
+     ------------------------------------------------------------
+     STEP 1 - JS 없이, HTML 속성만
+     ------------------------------------------------------------
+     JS 는 아직 한 줄도 쓰지 않습니다. HTML 속성만 붙입니다.
+
+     · 이름    비어 있으면 안 됨
+     · 아이디  비어 있으면 안 됨, 영문+숫자 4~12자
+     · 이메일  비어 있으면 안 됨, 이메일 모양
+     · 비밀번호 비어 있으면 안 됨, 8자 이상
+     · 나이    비어 있으면 안 됨, 1~120 사이의 숫자
+     · 지역    골라야 함
+     · 약관    체크해야 함
+
+     확인 1 : 아무것도 안 넣고 가입하기를 누르세요. 말풍선이 몇 개 뜹니까?
+              답:
+     확인 2 : 말풍선 글씨 색을 빨간색으로 바꿔보세요. 됩니까?
+              답:
+
+     ------------------------------------------------------------
+     STEP 2 - (함정) 나이 칸
+     ------------------------------------------------------------
+     · 나이를 type="number" min="1" max="120" 으로 바꾸고, required 는 빼세요.
+     · 나이를 비워둔 채로 가입하기를 누르세요.
+
+       예상:
+       실제:
+       왜 그런지:
+
+     · required 를 다시 붙이세요.
+
+     ------------------------------------------------------------
+     STEP 3 - (함정) 버튼이 두 개입니다
+     ------------------------------------------------------------
+     · #fill 을 누르면 모든 칸에 예시값이 들어가게 만드세요.
+       (지금은 그냥 값만 넣으면 됩니다)
+
+     · 넣고 나서 #fill 을 눌러보세요.
+
+       예상:
+       실제:
+       왜 그런지:
+
+     · 고치세요. HTML 한 글자... 는 아니고 한 속성입니다.
+
+     ------------------------------------------------------------
+     STEP 4 - 운전대를 내가 잡는다
+     ------------------------------------------------------------
+     · 폼에 novalidate 를 붙이세요.
+     · submit 을 가로채서 새로고침을 막고, 일단 console.log 만 찍으세요.
+
+     확인 : 빈 폼으로 가입하기를 눌렀을 때
+            (1) 말풍선이 안 뜨고  (2) 새로고침이 안 되고  (3) 로그가 찍히면 통과.
+
+     확인 : 칸에 커서를 두고 Enter 를 눌러보세요. 같은 로그가 찍힙니까?
+            답:
+
+     ------------------------------------------------------------
+     STEP 5 - 검증 함수 하나 + 에러 표시
+     ------------------------------------------------------------
+     이름 칸만 먼저 합니다.
+
+     · 이름을 검사하는 함수를 만드세요.
+       - 비었거나 공백만이면  "이름을 입력하세요"
+       - 2자 미만이면        "2자 이상 입력하세요"
+       - 한글이 아니면        "한글로 입력하세요"
+       - 문제 없으면         빈 문자열
+
+     · 메시지를 화면에 쓰는 함수를 따로 만드세요.
+       - data-for 가 맞는 .err 에 메시지를 넣고
+       - 칸에 invalid 클래스를 켜거나 끕니다
+
+     확인 : 검사하는 함수 안에 document / $ / ctx 가 한 개도 없어야 합니다.
+            있으면 역할이 섞인 겁니다.
+
+     재료만 - classList.toggle 의 두번째 인자, [data-for=...] 선택자
+
+     ------------------------------------------------------------
+     STEP 6 - 전부로 늘리기
+     ------------------------------------------------------------
+     · 칸 이름을 키로 하는 객체 하나에 검증을 모으세요.
+     · submit 때 전부 검사하고, 하나라도 에러면 보내지 않습니다.
+     · 첫번째 에러 칸으로 focus 를 보내세요.
+
+     검증 규칙
+       name    한글 2~5자
+       userid  영문+숫자 4~12자
+       email   @ 가 있을 것  (정규식 짜지 마세요. 11번 항목 읽으세요)
+       pw      영문/숫자/특수문자 각 1개 이상, 8자 이상
+       pw2     STEP 9 에서 합니다. 지금은 비었는지만
+       age     1~120 사이의 숫자
+       region  골랐는지
+       hobby   1개 이상 체크
+       agree   체크했는지
+
+     확인 : 칸을 하나 더 추가한다고 상상해보세요.
+            객체에 한 줄만 쓰면 되게 되어 있습니까?
+            답:
+
+     ------------------------------------------------------------
+     STEP 7 - (함정) 언제 검사할까
+     ------------------------------------------------------------
+     · 먼저 모든 칸에 input 이벤트로 검사를 다세요. (일부러)
+     · 이름 칸에 "노" 한 글자만 쳐보세요.
+
+       예상:
+       실제 느낌:
+
+     · 이제 이렇게 바꾸세요.
+       1) submit 때 전부
+       2) blur 때 그 칸만
+       3) 한번 에러가 난 칸은 그 뒤로 input 때마다
+
+     확인 : 아직 안 건드린 칸은 조용하고, 한번 틀린 칸은 고치는 즉시
+            빨간불이 꺼져야 합니다.
+
+     ------------------------------------------------------------
+     STEP 8 - (함정) 값을 한번에 꺼내기
+     ------------------------------------------------------------
+     · 검증을 통과하면 폼의 값을 객체로 만들어 #out 에 보기 좋게 찍으세요.
+       (JSON.stringify 의 세번째 인자를 쓰면 줄바꿈이 됩니다)
+
+     · 다 되면, 이메일 칸의 name 속성만 지우고 다시 해보세요.
+
+       예상:
+       실제:
+       왜 그런지:
+
+     · 되돌리세요.
+
+     · 관심사를 하나도 체크하지 않고 (검증을 잠깐 끄고) 찍어보세요.
+       hobby 가 어떻게 나옵니까?
+       답:
+
+     · 관심사를 두 개 체크하면 hobby 가 어떻게 나옵니까?
+       답:
+
+     재료만 - FormData, Object.fromEntries, getAll
+
+     ------------------------------------------------------------
+     STEP 9 - (함정) 두 칸이 서로를 봅니다
+     ------------------------------------------------------------
+     · 비밀번호 확인을 제대로 검사하세요. pw 와 다르면 에러입니다.
+
+     · 그 다음 이렇게 해보세요.
+       1) pw 에 "abcd1234!" 를 넣는다
+       2) pw2 에 "abcd1234!" 를 넣는다  -> 에러가 없다
+       3) pw 를 "zzzz9999@" 로 고친다
+
+       예상:
+       실제:
+       왜 그런지:
+
+     · 고치세요.
+
+     ------------------------------------------------------------
+     STEP 10 - 아이디 중복 확인
+     ------------------------------------------------------------
+     users.json 에 이미 가입된 아이디가 들어 있습니다.
+
+     · 아이디를 치는 동안 users.json 을 읽어서 이미 있는 아이디면 에러를 띄우세요.
+     · 한 글자마다 요청하면 안 됩니다. 08 에서 한 것을 쓰세요.
+     · 확인 중일 때는 "확인 중..." 을 보여주세요.
+     · 안 쓰는 아이디면 .err 에 ok 클래스를 켜서 "사용 가능합니다" 를 띄우세요.
+
+     · setCustomValidity 로도 막아보세요. 그리고 (함정)
+       1) "admin" 을 입력한다  -> 에러
+       2) "novel2026" 으로 고친다  -> 에러가 풀렸는데 가입하기가 안 된다
+
+       예상:
+       실제:
+       왜 그런지:
+
+     확인 : 아이디를 빠르게 10글자 치고, 네트워크 탭에서 요청이 몇 번 갔는지 보세요.
+            답:
+
+     재료만 - clearTimeout, setTimeout, fetch, res.ok, setCustomValidity
+
+     ------------------------------------------------------------
+     [완성 기준]
+       1) HTML 기본 검증 속성이 붙어 있다 (required / type / pattern)
+       2) novalidate 로 내가 잡고, preventDefault 가 있다
+       3) 검증이 객체 하나에 모여 있다 (칸 추가 = 한 줄 추가)
+       4) 검증 함수 안에 DOM 이 없다 (값 -> 메시지)
+       5) 타이밍이 submit + blur + 틀린 칸만 input 이다
+       6) 통과하면 FormData 로 만든 객체가 #out 에 찍힌다
+       7) pw 를 고치면 pw2 에러도 같이 갱신된다
+       8) 아이디 중복 확인이 디바운스된다
+       9) addEventListener 가 함수 안에 들어간 곳이 하나도 없다
+      10) 함정 6개(STEP 2,3,7,8,9,10)의 예상/실제가 적혀 있다
+     ============================================================ */
+
+
+  // 여기부터 작성하세요.
+
 
 </script>
 
