@@ -5,14 +5,66 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>10 - 애니메이션</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 16px;
+    }
+
+    canvas {
+      background: #111;
+      border: 1px solid #555;
+      display: block;
+      margin: 12px 0;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 6px 12px;
+      margin-right: 6px;
+    }
+
+    p {
+      min-height: 24px;
+    }
+  </style>
 </head>
 
 <body>
+  <canvas id="canvas" width="520" height="320"></canvas>
 
+  <button id="start">시작</button>
+  <button id="stop">정지</button>
+  <button id="reset">처음부터</button>
+  <p id="note"></p>
 </body>
 <script src="../lib.js"></script>
 <script>
   // ============ 10 - 애니메이션 ============
+  const ctx = canvas.getContext('2d')
+  const w = canvas.width
+  const h = canvas.height
+
+  /* data.json 안에 있는 것 (09 에서 가져옴)
+
+     months        ["1월" ... "12월"]
+     sales         { unit, 2024:[12개], 2025:[12개] }
+     temp          { unit, 서울:[12개], 부산:[12개] }
+     genres        [ {name, count} x5 ]
+     scores        [ {name, math, eng} x6 ]
+     visits        [ {day, pc, mobile} x7 ]
+  */
+  fetch("./data.json").then(r => {
+    if (!r.ok) throw new Error("데이터가 존재하지 않습니다.");
+  }).catch(err => alert(err))
 
 </script>
 
