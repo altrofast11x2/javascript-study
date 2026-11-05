@@ -161,7 +161,7 @@
 <body>
   <h1>장비 대여 신청</h1>
 
-  <form id="f" novalidate>
+  <form id="f">
     <div class="field">
       <label for="who">신청자 이름</label>
       <input type="text" id="who" name="who" placeholder="홍길동">
@@ -170,7 +170,7 @@
 
     <div class="field">
       <label for="tel">연락처</label>
-      <input type="tel" id="tel" name="tel" placeholder="010-0000-0000" maxlength="13">
+      <input type="text" id="tel" name="tel" placeholder="010-0000-0000">
       <p class="err" data-for="tel"></p>
     </div>
 
@@ -189,7 +189,7 @@
 
       <div class="field">
         <label for="qty">수량</label>
-        <input type="number" id="qty" name="qty" placeholder="1">
+        <input type="text" id="qty" name="qty" placeholder="1">
         <p class="err" data-for="qty"></p>
       </div>
     </div>
@@ -197,13 +197,13 @@
     <div class="half">
       <div class="field">
         <label for="start">대여일</label>
-        <input type="date" id="start" name="start" min="2026-11-05">
+        <input type="date" id="start" name="start">
         <p class="err" data-for="start"></p>
       </div>
 
       <div class="field">
         <label for="end">반납일</label>
-        <input type="date" id="end" name="end" min="2026-11-05">
+        <input type="date" id="end" name="end">
         <p class="err" data-for="end"></p>
       </div>
     </div>
@@ -211,27 +211,27 @@
     <div class="field">
       <label>결제 방법</label>
       <div class="group">
-        <label><input type="radio" name="pay" value="card" required> 카드</label>
-        <label><input type="radio" name="pay" value="bank" required> 계좌이체</label>
+        <label><input type="radio" name="pay" value="card"> 카드</label>
+        <label><input type="radio" name="pay" value="bank"> 계좌이체</label>
       </div>
       <p class="err" data-for="pay"></p>
     </div>
 
     <div class="field">
       <label for="payer">입금자명</label>
-      <input type="text" id="payer" name="payer" placeholder="계좌이체일 때만" disabled required>
+      <input type="text" id="payer" name="payer" placeholder="계좌이체일 때만">
       <p class="err" data-for="payer"></p>
     </div>
 
     <div class="field">
       <label for="coupon">쿠폰 코드</label>
-      <input type="text" id="coupon" name="coupon" placeholder="없으면 비워두세요" required>
+      <input type="text" id="coupon" name="coupon" placeholder="없으면 비워두세요">
       <p class="err" data-for="coupon"></p>
     </div>
 
     <div class="field">
       <label for="memo">요청 사항</label>
-      <textarea id="memo" name="memo" placeholder="없으면 비워두세요" required></textarea>
+      <textarea id="memo" name="memo" placeholder="없으면 비워두세요"></textarea>
       <p class="count" id="memo-count"></p>
       <p class="err" data-for="memo"></p>
     </div>
@@ -244,89 +244,14 @@
     </div>
 
     <button type="submit" id="send">신청하기</button>
-    <button type="button" id="fill">예시값 채우기</button>
-    <button type="button" id="clear">다 지우기</button>
+    <button id="fill">예시값 채우기</button>
+    <button id="clear">다 지우기</button>
   </form>
 
   <div id="out"></div>
 
   <script src="../lib.js"></script>
   <script>
-    const form = $("#f")
-    const who = $("#who")
-    const tel = $("#tel")
-    const item = $("#item")
-    const qty = $("#qty")
-    const start = $("#start")
-    const end = $("#end")
-    const pay = form.elements['pay']
-    const payer = $("#payer")
-    const coupon = $("#coupon")
-    const memo = $("#memo")
-    const memo_count = $("#memo-count")
-    const agree = $("#agree")
-    const send = $("#send")
-    const fill = $("#fill")
-    const clear = $("#clear")
-
-    function togglePayer() {
-      if (pay.value === 'bank') {
-        payer.disabled = false
-      } else {
-        payer.disabled = true
-        payer.value = ""
-      }
-    }
-    form.onchange = e => {
-      if (e.target.name === 'pay') {
-        togglePayer()
-      }
-    }
-    fill.onclick = () => {
-      who.value = "홍길동"
-      tel.value = "010-1234-5678"
-      item.value = "laptop"
-      qty.value = 100
-      start.value = "2026-11-05"
-      end.value = "2026-11-12"
-      pay.value = 'card'
-      togglePayer()
-      coupon.value = "ABCD-EFGH-IJKL"
-      memo.value = "잘 부탁드립니다~~"
-      agree.checked = true
-    }
-    clear.onclick = () => {
-      form.reset()
-      togglePayer()
-    }
-    form.addEventListener('submit', e => {
-      e.preventDefault()
-      console.log(e);
-    })
-    function showError(name, msg) {
-      const input = $(`#${name}`)
-      const err = $(`[data-for="${name}"]`)
-      err.textContent = msg
-      err.classList.toggle('invalid', !!msg)
-    }
-    // 아이디
-    who.oninput=()=>{
-      
-    }
-    // 전화번호
-    tel.oninput = e => {
-      tel.value = tel.value
-        .replace(/[^0-9]/g, "")
-        .replace(/(\d{3})(\d{0,4})(\d{0,4})/, (_, a, b, c) =>
-          [a, b, c].filter(Boolean).join('-'))
-      if (!tel.value.trim()) {
-        showError('tel', '연락처를 입력하세요.')
-      } else if (!/^010-\d{4}-\d{4}$/.test(tel.value)) {
-        showError('tel', "010-0000-0000 형식으로 입력해주세요.");
-      } else {
-        showError('tel', "");
-      }
-    }
     // ============ 11 - 폼 검증 ============
 
     /* ============================================================
@@ -388,12 +313,12 @@
        위 규칙 중에서 HTML 속성만으로 되는 것을 골라 붙이세요.
 
        확인 1 : 아무것도 안 넣고 신청하기를 누르세요. 말풍선이 몇 개 뜹니까?
-                답:안뜸.
+                답:
        확인 2 : 대여일에 과거 날짜를 막는 속성을 붙였습니까? 붙였다면,
                 날짜 칸에 키보드로 2020-01-01 을 쳐넣을 수 있습니까?
-                답:네
+                답:
        확인 3 : qty 를 type="number" 로 바꾸면 "3.5" 를 막을 수 있습니까?
-                답:아니오.
+                답:
 
        ------------------------------------------------------------
        STEP 2 - (함정) 라디오 버튼
@@ -401,12 +326,12 @@
        · 결제 방법 라디오 둘 중 하나에만 required 를 붙이세요.
        · 아무것도 안 고르고 신청하기를 누르세요.
 
-         예상: 막힐거같음.
-         실제: 막힘.
-         왜 그런지: required 를 넣었으니까.
+         예상:
+         실제:
+         왜 그런지:
 
        · 이번엔 둘 다에 required 를 붙이고 다시 해보세요. 뭐가 달라집니까?
-         답: 둘다 붙여도 하나만 채크해도 동작이 됨.
+         답:
 
        ------------------------------------------------------------
        STEP 3 - (함정) 버튼이 세 개입니다
@@ -416,15 +341,15 @@
 
        · 만들고 나서 #fill 을 눌러보세요.
 
-         예상:잘 작동함.
-         실제:잘 작동함.
-         왜 그런지: 다른 버튼들한테 type 이 없었음.
+         예상:
+         실제:
+         왜 그런지:
 
        · 고치세요. HTML 한 속성입니다.
 
        · #clear 는 폼을 비우는 기본 기능이 이미 브라우저에 있습니다.
          그걸 쓰면 속성 하나로 끝납니다. 찾아보세요.
-         답: form.reset()
+         답:
 
        ------------------------------------------------------------
        STEP 4 - 운전대를 내가 잡는다
@@ -436,7 +361,7 @@
               (1) 말풍선이 안 뜨고  (2) 새로고침이 안 되고  (3) 로그가 찍히면 통과.
 
        확인 : 쿠폰 칸에 커서를 두고 Enter 를 눌러보세요. 같은 로그가 찍힙니까?
-              답: 네 찍힙니다.
+              답:
 
        ------------------------------------------------------------
        STEP 5 - 검증 함수 하나 + 에러 표시
