@@ -33,46 +33,46 @@
 <body>
   <h1>회원가입</h1>
 
-  <form id="f">
+  <form id="f" novalidate>
     <div class="field">
       <label for="name">이름</label>
-      <input type="text" id="name" name="name" placeholder="홍길동">
+      <input type="text" id="name" name="name" placeholder="홍길동" required aria-invalid="true">
       <p class="err" data-for="name"></p>
     </div>
 
     <div class="field">
       <label for="userid">아이디</label>
-      <input type="text" id="userid" name="userid" placeholder="영문+숫자 4~12자">
+      <input type="text" id="userid" name="userid" placeholder="영문+숫자 4~12자" pattern="[a-zA-Z0-9]{4,12}" required>
       <p class="err" data-for="userid"></p>
     </div>
 
     <div class="field">
       <label for="email">이메일</label>
-      <input type="text" id="email" name="email" placeholder="me@example.com">
+      <input type="email" id="email" name="email" placeholder="me@example.com" required>
       <p class="err" data-for="email"></p>
     </div>
 
     <div class="field">
       <label for="pw">비밀번호</label>
-      <input type="password" id="pw" name="pw" placeholder="영문+숫자+특수문자 8자 이상">
+      <input type="password" id="pw" name="pw" placeholder="영문+숫자+특수문자 8자 이상" pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}" required>
       <p class="err" data-for="pw"></p>
     </div>
 
     <div class="field">
       <label for="pw2">비밀번호 확인</label>
-      <input type="password" id="pw2" name="pw2">
+      <input type="password" id="pw2" name="pw2" minlength="8" required>
       <p class="err" data-for="pw2"></p>
     </div>
 
     <div class="field">
       <label for="age">나이</label>
-      <input type="text" id="age" name="age" placeholder="숫자만">
+      <input type="number" id="age" name="age" placeholder="숫자만" min="1" max="120" required>
       <p class="err" data-for="age"></p>
     </div>
 
     <div class="field">
       <label for="region">지역</label>
-      <select id="region" name="region">
+      <select id="region" name="region" required>
         <option value="">선택하세요</option>
         <option value="seoul">서울</option>
         <option value="busan">부산</option>
@@ -96,19 +96,37 @@
 
     <div class="field">
       <div class="group">
-        <label><input type="checkbox" id="agree" name="agree"> 약관에 동의합니다</label>
+        <label><input type="checkbox" id="agree" name="agree" required> 약관에 동의합니다</label>
       </div>
       <p class="err" data-for="agree"></p>
     </div>
 
-    <button id="send">가입하기</button>
-    <button id="fill">예시값 채우기</button>
+    <button type="submit" id="send">가입하기</button>
+    <button type="button" id="fill">예시값 채우기</button>
   </form>
 
   <div id="out"></div>
 </body>
 <script src="../lib.js"></script>
 <script>
+  $("#fill").onclick=()=>{
+    $("#name").value = 'abc'
+    $("#userid").value = 'abc123'
+    $("#email").value = 'abc123@email.com'
+    $("#pw").value = 'abc123@email.com'
+    $("#pw2").value = 'abc123@email.com'
+    $("#age").value = 14
+    $$("[name='hobby']").forEach(e => {
+      e.checked = true
+    });
+    $("#region").value = 'seoul'
+    $("#agree").checked = true
+  }
+  $("#f").addEventListener('submit',e=>{
+    e.preventDefault()
+    console.log(e);
+  })
+  
   // ============ 11 - 폼 검증 ============
 
   /* ============================================================
@@ -134,11 +152,11 @@
      · 나이    비어 있으면 안 됨, 1~120 사이의 숫자
      · 지역    골라야 함
      · 약관    체크해야 함
-
+    
      확인 1 : 아무것도 안 넣고 가입하기를 누르세요. 말풍선이 몇 개 뜹니까?
-              답:
+              답: 1개
      확인 2 : 말풍선 글씨 색을 빨간색으로 바꿔보세요. 됩니까?
-              답:
+              답: 문제 요구사항을 보면 JS 없이 하라고 함, 따라서 안됨. JS 써야함
 
      ------------------------------------------------------------
      STEP 2 - (함정) 나이 칸
@@ -146,12 +164,12 @@
      · 나이를 type="number" min="1" max="120" 으로 바꾸고, required 는 빼세요.
      · 나이를 비워둔 채로 가입하기를 누르세요.
 
-       예상:
-       실제:
-       왜 그런지:
+       예상: 그냥 submit 될거같음.
+       실제: required 를 빼고 하니까 진짜 submit 이 됨.
+       왜 그런지:required 뻈으니까?
 
      · required 를 다시 붙이세요.
-
+     값을 채우라고함.
      ------------------------------------------------------------
      STEP 3 - (함정) 버튼이 두 개입니다
      ------------------------------------------------------------
@@ -160,9 +178,9 @@
 
      · 넣고 나서 #fill 을 눌러보세요.
 
-       예상:
-       실제:
-       왜 그런지:
+       예상: 안에 기존값을 내가 바꿔서 내가 모든칸에 다 넣고 예시를 넣으면 예시로 모두 바뀜.
+       실제: 예시로 모두 바뀜.
+       왜 그런지: input 의 값을 내가 더해준게 아니고 지정해줘서.
 
      · 고치세요. HTML 한 글자... 는 아니고 한 속성입니다.
 
@@ -176,7 +194,7 @@
             (1) 말풍선이 안 뜨고  (2) 새로고침이 안 되고  (3) 로그가 찍히면 통과.
 
      확인 : 칸에 커서를 두고 Enter 를 눌러보세요. 같은 로그가 찍힙니까?
-            답:
+            답: 네 같은 로그가 찍힙니다.
 
      ------------------------------------------------------------
      STEP 5 - 검증 함수 하나 + 에러 표시
@@ -277,25 +295,78 @@
      · 고치세요.
 
      ------------------------------------------------------------
-     STEP 10 - 아이디 중복 확인
+     STEP 10-A - 아이디 중복 확인 : 버튼 방식
      ------------------------------------------------------------
      users.json 에 이미 가입된 아이디가 들어 있습니다.
 
-     · 아이디를 치는 동안 users.json 을 읽어서 이미 있는 아이디면 에러를 띄우세요.
-     · 한 글자마다 요청하면 안 됩니다. 08 에서 한 것을 쓰세요.
-     · 확인 중일 때는 "확인 중..." 을 보여주세요.
-     · 안 쓰는 아이디면 .err 에 ok 클래스를 켜서 "사용 가능합니다" 를 띄우세요.
+     아이디 칸 옆에 "중복확인" 버튼을 직접 추가하세요.
+     (HTML 을 고쳐야 합니다. 이 버튼은 폼을 보내면 안 됩니다 - STEP 3 에서 배운 것)
 
-     · setCustomValidity 로도 막아보세요. 그리고 (함정)
-       1) "admin" 을 입력한다  -> 에러
-       2) "novel2026" 으로 고친다  -> 에러가 풀렸는데 가입하기가 안 된다
+     · 버튼을 누르면 users.json 을 읽어서 판단하세요.
+       - 이미 있는 아이디   .err 에 "이미 사용 중인 아이디입니다"
+       - 안 쓰는 아이디     .err 에 ok 클래스를 켜서 "사용 가능합니다"
+     · 읽는 동안은 "확인 중..." 을 보여주세요.
+     · 아이디가 형식에 안 맞으면(STEP 6 의 규칙) 요청을 보내지 마세요.
+
+     · 확인 결과를 변수에 담아 두고, submit 때 그걸 보고 막으세요.
+       (boolean 말고 "검사한 값" 을 담으면 변수 하나로 끝납니다 - 이미 아시는 그것)
+
+     · (함정 1) 느린 서버를 흉내내세요. fetch 앞에 일부러 2초를 쉬게 만듭니다.
+       그리고 이 순서대로 하세요.
+       1) "novel2026" 입력 -> 중복확인 클릭
+       2) 응답이 오기 전에 칸을 "admin" 으로 고친다
+       3) 응답이 온 뒤 가입하기를 누른다
 
        예상:
        실제:
        왜 그런지:
 
-     확인 : 아이디를 빠르게 10글자 치고, 네트워크 탭에서 요청이 몇 번 갔는지 보세요.
+     · 고치세요. 힌트는 "같은 값을 몇 번 읽었나" 입니다.
+
+     · (함정 2) 서버가 터진 경우를 흉내내세요.
+       users.json 대신 없는 파일(nope.json)을 읽게 바꾸고 중복확인을 누르세요.
+       📂 nope.json 은 일부러 없습니다. 만들지 마세요. 404 가 이 함정의 내용입니다.
+
+       예상:
+       실제:
+       왜 그런지:
+
+     · 고치세요. 08 에서 한 것입니다. 사용자가 뭐가 잘못됐는지 알 수 있어야 합니다.
+
+     · (함정 3) 중복확인을 빠르게 다섯 번 누르세요.
+       Network 탭에서 요청이 몇 번 갔습니까?
+
+       예상:
+       실제:
+
+     · 고치세요. 확인 중에는 두 번 눌릴 수 없어야 합니다.
+
+     확인 : 아이디가 형식에 안 맞을 때(1글자 등) 요청이 가지 않습니까?
             답:
+
+     ------------------------------------------------------------
+     STEP 10-B - 같은 것을 input 방식으로
+     ------------------------------------------------------------
+     버튼을 지우고, 치는 동안 자동으로 확인하게 바꾸세요.
+
+     · 한 글자마다 요청하면 안 됩니다. 08 에서 한 것을 쓰세요.
+     · 상태가 몇 개로 줄어드는지 보세요.
+
+     · (함정) setCustomValidity 로도 막아보세요. 그리고
+       1) "admin" 을 입력한다  -> 에러
+       2) "novel2026" 으로 고친다  -> 에러 글씨는 사라졌는데 가입하기가 안 된다
+
+       예상:
+       실제:
+       왜 그런지:
+
+     확인 1 : 아이디를 빠르게 10글자 치세요. 개발자도구 Network 탭에서
+              users.json 요청이 몇 번 갔습니까?
+              답:
+     확인 2 : 디바운스를 뺐다면 몇 번 갔을까요?
+              답:
+     확인 3 : 10-A 와 10-B 중 어느 쪽이 코드가 짧았습니까?
+              답:
 
      재료만 - clearTimeout, setTimeout, fetch, res.ok, setCustomValidity
 
@@ -308,9 +379,13 @@
        5) 타이밍이 submit + blur + 틀린 칸만 input 이다
        6) 통과하면 FormData 로 만든 객체가 #out 에 찍힌다
        7) pw 를 고치면 pw2 에러도 같이 갱신된다
-       8) 아이디 중복 확인이 디바운스된다
-       9) addEventListener 가 함수 안에 들어간 곳이 하나도 없다
-      10) 함정 6개(STEP 2,3,7,8,9,10)의 예상/실제가 적혀 있다
+       8) 중복 확인을 버튼(10-A)과 input+디바운스(10-B) 두 방식으로 다 해봤다
+       9) 10-A 에서 중복확인을 안 누르고는 가입이 안 된다
+      10) 10-A 에서 느린 응답 중에 아이디를 바꿔치기해도 통과되지 않는다
+      11) 10-A 에서 서버가 터져도 사용자가 알 수 있다 (res.ok + catch)
+      12) 10-A 에서 버튼을 연타해도 요청이 한 번만 간다
+      13) addEventListener 가 함수 안에 들어간 곳이 하나도 없다
+      14) 함정 9개(STEP 2,3,7,8,9,10-A×3,10-B)의 예상/실제가 적혀 있다
      ============================================================ */
 
 
