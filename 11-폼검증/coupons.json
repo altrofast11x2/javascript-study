@@ -1,0 +1,11 @@
+{
+  "coupons": [
+    { "code": "WELCOME10", "off": 10, "until": "2026-12-31" },
+    { "code": "SKILL2026", "off": 20, "until": "2026-12-20" },
+    { "code": "NOVEL5",    "off": 5,  "until": "2027-03-31" },
+    { "code": "FIRSTDAY",  "off": 30, "until": "2026-11-30" },
+    { "code": "SUMMER24",  "off": 15, "until": "2026-08-31" },
+    { "code": "OLDEVENT",  "off": 25, "until": "2026-01-31" },
+    { "code": "TESTONLY",  "off": 50, "until": "2025-12-31" }
+  ]
+}
