@@ -161,7 +161,7 @@
 <body>
   <h1>장비 대여 신청</h1>
 
-  <form id="f">
+  <form id="f" novalidate>
     <div class="field">
       <label for="who">신청자 이름</label>
       <input type="text" id="who" name="who" placeholder="홍길동">
@@ -170,7 +170,7 @@
 
     <div class="field">
       <label for="tel">연락처</label>
-      <input type="text" id="tel" name="tel" placeholder="010-0000-0000">
+      <input type="text" id="tel" name="tel" placeholder="010-0000-0000" maxlength="13">
       <p class="err" data-for="tel"></p>
     </div>
 
@@ -189,7 +189,7 @@
 
       <div class="field">
         <label for="qty">수량</label>
-        <input type="text" id="qty" name="qty" placeholder="1">
+        <input type="number" id="qty" name="qty" placeholder="1">
         <p class="err" data-for="qty"></p>
       </div>
     </div>
@@ -219,7 +219,7 @@
 
     <div class="field">
       <label for="payer">입금자명</label>
-      <input type="text" id="payer" name="payer" placeholder="계좌이체일 때만">
+      <input type="text" id="payer" name="payer" placeholder="계좌이체일 때만" disabled>
       <p class="err" data-for="payer"></p>
     </div>
 
@@ -244,8 +244,8 @@
     </div>
 
     <button type="submit" id="send">신청하기</button>
-    <button id="fill">예시값 채우기</button>
-    <button id="clear">다 지우기</button>
+    <button type="button" id="fill">예시값 채우기</button>
+    <button type="button" id="clear">다 지우기</button>
   </form>
 
   <div id="out"></div>
@@ -253,7 +253,107 @@
   <script src="../lib.js"></script>
   <script>
     // ============ 11 - 폼 검증 ============
+    const form = $("#f")
+    const who = $("#who")
+    const tel = $("#tel")
+    const item = $("#item")
+    const qty = $("#qty")
+    const start = $("#start")
+    const pay = form.elements['pay']
+    const end = $("#end")
+    const payer = $("#payer")
+    const coupon = $("#coupon")
+    const memo = $("#memo")
+    const agree = $("#agree")
+    const send = $("#send")
+    const fill = $("#fill")
+    const clear = $("#clear")
+    // date
+    const today = new Date()
+    const date = today.toLocaleDateString().slice(0, 10)
+    start.min = date
+    end.min = date
+    form.onchange = (e) => {
+      if (e.target.name === 'pay') {
+        PayerToggle()
+      }
+    }
+    // fill value
+    fill.onclick = () => {
+      who.value = "홍길동"
+      tel.value = "010-1234-5678"
+      item.value = "laptop"
+      qty.value = 100
+      start.value = "2026-11-06"
+      pay.value = "card"
+      PayerToggle()
+      end.value = "2026-11-07"
+      coupon.value = "ABCD-EFGH-IJKL"
+      memo.value = "Hello World!"
+      agree.checked = true
+    }
+    clear.onclick = () => form.reset()
+    // functions 
+    function PayerToggle() {
+      if (pay.value === 'card') {
+        payer.disabled = true
+        payer.value = ""
+      }
+      else if (pay.value === 'bank') {
+        payer.disabled = false
+      }
+    }
+    function showError(name, msg) {
+      const input = form.elements[name]
+      const err = $(`[data-for="${name}"]`);
+      err.textContent = msg
+      input.classList.toggle('invalid', !!msg)
+    }
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+      console.log(send);
+    })
+    // tel
+    tel.oninput = e => {
 
+      tel.value = tel.value
+        .replace(/[^0-9]/g, "")
+        .replace(/^(\d{3})(\d{0,4})(\d{0,4})$/, (_, f, s, t) =>
+          [f, s, t].filter(Boolean).join('-'))
+
+      if (!tel.value) {
+        showError('tel', '연락처를 입력하세요.')
+      } else if (!/^010-\d{4}-\d{4}$/.test(tel.value)) {
+        showError('tel', '010-0000-0000 형식으로 입력하세요.')
+      } else showError('tel', '')
+    }
+    // step6
+    form.onsubmit = () => {
+      e.preventDefault()
+      let firstError = null
+      const rules = {
+        who: e => !/[가-힣]{2,5}/.test(e.value) ? '' : "이름을 한글 2~5자로 입력하세요.",
+        tel: e => !e.value ? "연락처를 입력하세요" : /^010-\d{4}-\d{4}$/.test(e.value) ? '' : '010-0000-0000 형식으로 입력하세요.',
+        item: e => e.value ? '' : "품목을 선택하세요.",
+        qty: e => e.value ? '' : "수량을 선택하세요.",
+        start: e => e.value ? '' : "대여일을 선택하세요.",
+        end: e => e.value ? '' : "반납일을 선택하세요.",
+        pay: e => e.value ? '' : "결제 방법을 선택하세요.",
+        payer: e => "",
+        coupon: e => "",
+        memo: e => "",
+        agree: e => e.checked ? '' : "대여 규정에 동의 해야합니다."
+      }
+      Object.entries(rules).forEach(([k, v]) => {
+        const input = form.elements[k]
+        const msg = v(input)
+        showError(k, msg)
+        if (msg && !firstError) {
+          firstError = k === 'pay' ? input[0] : input
+        }
+      });
+      firstError?.focus()
+    }
     /* ============================================================
        미션 : 장비 대여 신청 폼 검증
 
@@ -313,12 +413,12 @@
        위 규칙 중에서 HTML 속성만으로 되는 것을 골라 붙이세요.
 
        확인 1 : 아무것도 안 넣고 신청하기를 누르세요. 말풍선이 몇 개 뜹니까?
-                답:
+                답: 안뜸.
        확인 2 : 대여일에 과거 날짜를 막는 속성을 붙였습니까? 붙였다면,
                 날짜 칸에 키보드로 2020-01-01 을 쳐넣을 수 있습니까?
-                답:
+                답:못 넣음.
        확인 3 : qty 를 type="number" 로 바꾸면 "3.5" 를 막을 수 있습니까?
-                답:
+                답:막음. step을 넣으면 달라지지만..
 
        ------------------------------------------------------------
        STEP 2 - (함정) 라디오 버튼
@@ -326,12 +426,12 @@
        · 결제 방법 라디오 둘 중 하나에만 required 를 붙이세요.
        · 아무것도 안 고르고 신청하기를 누르세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 말풍선이뜸.
+         실제: 말풍선이뜸.
+         왜 그런지: required 했으니까?
 
        · 이번엔 둘 다에 required 를 붙이고 다시 해보세요. 뭐가 달라집니까?
-         답:
+         답: 둘중하나만 체크해도됨.
 
        ------------------------------------------------------------
        STEP 3 - (함정) 버튼이 세 개입니다
@@ -341,15 +441,15 @@
 
        · 만들고 나서 #fill 을 눌러보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 버튼에 type 이 없어서 submit 으로 처리됨. 하지만 나는 작동하죠? ㅋ
+         실제: 버튼에 type 이 없어서 submit 으로 처리됨. 하지만 나는 작동하죠? ㅋ
+         왜 그런지: 버튼에 type 이 없어서 submit 으로 처리됨. 하지만 나는 작동하죠? ㅋ
 
        · 고치세요. HTML 한 속성입니다.
 
        · #clear 는 폼을 비우는 기본 기능이 이미 브라우저에 있습니다.
          그걸 쓰면 속성 하나로 끝납니다. 찾아보세요.
-         답:
+         답: reset()
 
        ------------------------------------------------------------
        STEP 4 - 운전대를 내가 잡는다
