@@ -254,105 +254,91 @@
   <script>
     // ============ 11 - 폼 검증 ============
     const form = $("#f")
-    const who = $("#who")
-    const tel = $("#tel")
-    const item = $("#item")
-    const qty = $("#qty")
-    const start = $("#start")
-    const pay = form.elements['pay']
-    const end = $("#end")
-    const payer = $("#payer")
-    const coupon = $("#coupon")
-    const memo = $("#memo")
-    const agree = $("#agree")
-    const send = $("#send")
+    const pay = form.elements.pay
     const fill = $("#fill")
     const clear = $("#clear")
+    const send = $("#send")
+    const field = Object.fromEntries([...form.elements].filter(e => e.name && e.name !== 'pay').map(e => [e.name, e]))
+    const { who, tel, item, qty, start, end, payer, coupon, memo, agree } = field
+    console.log(field);
     // date
     const today = new Date()
-    const date = today.toLocaleDateString().slice(0, 10)
-    start.min = date
-    end.min = date
-    form.onchange = (e) => {
-      if (e.target.name === 'pay') {
-        PayerToggle()
-      }
+    const date = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0')
+    ].join('-')
+    // functions
+    function payerToggle() {
+      payer.disabled = pay.value !== 'bank'
+      if (payer.disabled) payer.value = ""
     }
-    // fill value
+    function showError(name, msg) {
+      const input = $(`#${name}`)
+      const err = $(`[data-for="${name}"]`)
+      const target = name === 'pay' ? pay[0].closest('.group') : input
+      err.textContent = msg
+      target.classList.toggle('invalid', !!msg)
+    }
+    form.onchange = (e) => {
+      if (e.target.name === 'pay') payerToggle()
+    }
+    // fill
     fill.onclick = () => {
       who.value = "홍길동"
       tel.value = "010-1234-5678"
       item.value = "laptop"
       qty.value = 100
-      start.value = "2026-11-06"
+      start.value = date
       pay.value = "card"
-      PayerToggle()
-      end.value = "2026-11-07"
+      payerToggle()
+      end.value = date
       coupon.value = "ABCD-EFGH-IJKL"
       memo.value = "Hello World!"
       agree.checked = true
     }
-    clear.onclick = () => form.reset()
-    // functions 
-    function PayerToggle() {
-      if (pay.value === 'card') {
-        payer.disabled = true
-        payer.value = ""
-      }
-      else if (pay.value === 'bank') {
-        payer.disabled = false
-      }
+    // clear
+    clear.onclick = () => {
+      form.reset();
+      payerToggle();
+      Object.keys(rules).forEach(name => showError(name, ''))
     }
-    function showError(name, msg) {
-      const input = form.elements[name]
-      const err = $(`[data-for="${name}"]`);
-      err.textContent = msg
-      input.classList.toggle('invalid', !!msg)
-    }
-    form.addEventListener('submit', e => {
-      e.preventDefault()
-      console.log(send);
-    })
     // tel
-    tel.oninput = e => {
-
+    tel.oninput = () => {
       tel.value = tel.value
         .replace(/[^0-9]/g, "")
-        .replace(/^(\d{3})(\d{0,4})(\d{0,4})$/, (_, f, s, t) =>
-          [f, s, t].filter(Boolean).join('-'))
-
-      if (!tel.value) {
-        showError('tel', '연락처를 입력하세요.')
-      } else if (!/^010-\d{4}-\d{4}$/.test(tel.value)) {
-        showError('tel', '010-0000-0000 형식으로 입력하세요.')
-      } else showError('tel', '')
+        .replace(/(\d{3})(\d{0,4})(\d{0,4})/, (_, f, s, t) => [f, s, t].filter(Boolean).join('-'));
     }
-    // step6
-    form.onsubmit = () => {
+    // rule
+    const rules = {
+      who: e => !e.value ? "이름을 입력하세요." : /^[가-힣]{2,5}$/.test(e.value) ? "" : "이름을 한글 2~5자 입력하세요.",
+      tel: e => !e.value ? "연락처를 입력하세요." : /^010-\d{4}-\d{4}$/.test(e.value) ? '' : "010-0000-0000 형식으로 입력하세요.",
+      item: e => e.value ? "" : "품목을 선택하세요.",
+      qty: e => e.value && Number.isInteger(+e.value) && +e.value >= 1 ? '' : '수량을 선택하세요.',
+      start: e => e.value ? "" : "대여일을 선택하세요.",
+      pay: e => e.value ? "" : "결제 방법을 선택하세요.",
+      end: e => e.value ? "" : "반납일을 선택하세요.",
+      payer: e => "",
+      coupon: e => "",
+      memo: e => "",
+      agree: e => e.checked ? "" : "대여 규정에 동의해야합니다.",
+    }
+    // form
+    form.onsubmit = e => {
       e.preventDefault()
       let firstError = null
-      const rules = {
-        who: e => !/[가-힣]{2,5}/.test(e.value) ? '' : "이름을 한글 2~5자로 입력하세요.",
-        tel: e => !e.value ? "연락처를 입력하세요" : /^010-\d{4}-\d{4}$/.test(e.value) ? '' : '010-0000-0000 형식으로 입력하세요.',
-        item: e => e.value ? '' : "품목을 선택하세요.",
-        qty: e => e.value ? '' : "수량을 선택하세요.",
-        start: e => e.value ? '' : "대여일을 선택하세요.",
-        end: e => e.value ? '' : "반납일을 선택하세요.",
-        pay: e => e.value ? '' : "결제 방법을 선택하세요.",
-        payer: e => "",
-        coupon: e => "",
-        memo: e => "",
-        agree: e => e.checked ? '' : "대여 규정에 동의 해야합니다."
-      }
-      Object.entries(rules).forEach(([k, v]) => {
-        const input = form.elements[k]
+      Object.entries(rules).forEach(([name, v]) => {
+        const input = name === 'pay' ? pay : field[name]
         const msg = v(input)
-        showError(k, msg)
+        showError(name, msg)
         if (msg && !firstError) {
-          firstError = k === 'pay' ? input[0] : input
+          firstError = name === 'pay' ? pay[0] : input
         }
-      });
-      firstError?.focus()
+      })
+      if (firstError) {
+        firstError.focus()
+        return
+      }
     }
     /* ============================================================
        미션 : 장비 대여 신청 폼 검증
