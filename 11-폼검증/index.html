@@ -197,13 +197,13 @@
     <div class="half">
       <div class="field">
         <label for="start">대여일</label>
-        <input type="date" id="start" name="start" min="2026-11-06">
+        <input type="date" id="start" name="start">
         <p class="err" data-for="start"></p>
       </div>
 
       <div class="field">
         <label for="end">반납일</label>
-        <input type="date" id="end" name="end" min="2026-11-06">
+        <input type="date" id="end" name="end">
         <p class="err" data-for="end"></p>
       </div>
     </div>
@@ -261,6 +261,13 @@
     const field = Object.fromEntries([...form.elements].filter(e => e.name && e.name !== 'pay').map(e => [e.name, e]))
     const { who, tel, item, qty, start, end, payer, coupon, memo, agree } = field
     console.log(field);
+    // date
+    const today = new Date()
+    const date = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0')
+    ].join('-')
     // functions
     function payerToggle() {
       payer.disabled = pay.value !== 'bank'
