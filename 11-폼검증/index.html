@@ -232,7 +232,7 @@
     <div class="field">
       <label for="memo">요청 사항</label>
       <textarea id="memo" name="memo" placeholder="없으면 비워두세요"></textarea>
-      <p class="count" id="memo-count"></p>
+      <p class="count" id="memo-count">0 / 100</p>
       <p class="err" data-for="memo"></p>
     </div>
 
@@ -258,6 +258,7 @@
     const fill = $("#fill")
     const clear = $("#clear")
     const send = $("#send")
+    const memo_count = $("#memo-count")
     const field = Object.fromEntries([...form.elements].filter(e => e.name && e.name !== 'pay').map(e => [e.name, e]))
     const { who, tel, item, qty, start, end, payer, coupon, memo, agree } = field
     console.log(field);
@@ -273,15 +274,27 @@
       payer.disabled = pay.value !== 'bank'
       if (payer.disabled) payer.value = ""
     }
+    form.onchange = (e) => {
+      if (e.target.name === 'pay') {
+        payerToggle()
+        if ($(`[data-for='payer']`).textContent) {
+          showError('payer', rules.payer(payer))
+        }
+        if (e.target.name === 'start' && end.value) {
+          showError('end', rules.end(end))
+        }
+
+        if (e.target.name === 'item' && qty.value) {
+          showError('qty', rules.payer(qty))
+        }
+      }
+    }
     function showError(name, msg) {
       const input = $(`#${name}`)
       const err = $(`[data-for="${name}"]`)
       const target = name === 'pay' ? pay[0].closest('.group') : input
       err.textContent = msg
       target.classList.toggle('invalid', !!msg)
-    }
-    form.onchange = (e) => {
-      if (e.target.name === 'pay') payerToggle()
     }
     // fill
     fill.onclick = () => {
@@ -313,15 +326,26 @@
     const rules = {
       who: e => !e.value ? "이름을 입력하세요." : /^[가-힣]{2,5}$/.test(e.value) ? "" : "이름을 한글 2~5자 입력하세요.",
       tel: e => !e.value ? "연락처를 입력하세요." : /^010-\d{4}-\d{4}$/.test(e.value) ? '' : "010-0000-0000 형식으로 입력하세요.",
-      item: e => e.value ? "" : "품목을 선택하세요.",
-      qty: e => e.value && Number.isInteger(+e.value) && +e.value >= 1 ? '' : '수량을 선택하세요.',
-      start: e => e.value ? "" : "대여일을 선택하세요.",
+      item: e =>{
+        const max =         
+      },
+      qty: e => !e.value
+        ? "수량을 선택하세요." && Number.isInteger(+e.value) && +e.value >= 1 : "",
+      start: e => !e.value ? "대여일을 선택하세요." : e.value < today ? "대여일은 오늘 이후로 선택하세요." : "",
       pay: e => e.value ? "" : "결제 방법을 선택하세요.",
-      end: e => e.value ? "" : "반납일을 선택하세요.",
-      payer: e => "",
+      end: e => {
+        if (!e.value) return "반납일을 선택하세요."
+        if (!start.value) return "먼저 대여일을 선택하세요."
+        const diff = (Date.parse(e.value) - Date.parse(start.value) / 846400000)
+        console.log(Date.parse(e.value));
+        return diff <= 20
+          ? "반납일은 대여일보다 뒤여야 합니다." : diff > 7
+            ? "대여 기간은 최대 7일입니다." : ""
+      },
+      payer: e => pay.value !== 'bank' ? "" : !e.value ? "입금자명을 입력하세요." : /^[가-힣]{2,5}$/.test(e.value) ? "" : "입금자명은 한글 2~5자로 입력하세요.",
       coupon: e => "",
-      memo: e => "",
-      agree: e => e.checked ? "" : "대여 규정에 동의해야합니다.",
+      memo: e => (e.value.length > 100) ? "최대 글자입니다." : "",
+      agree: e => !e.checked ? "대여 규정에 동의해야합니다." : "",
     }
     // form
     form.onsubmit = e => {
@@ -339,7 +363,20 @@
         firstError.focus()
         return
       }
+      console.log('신청완료');
     }
+    // step 7
+    Object.entries(rules).forEach(([name, v]) => {
+      const input = name === 'pay' ? pay : field[name]
+      input.onblur = () => {
+        showError(name, rules[name](input))
+      }
+    });
+    memo.oninput = () => {
+      const max = 100
+      memo_count.textContent = `${memo.value.length} / ${String(max)}`
+    }
+    // step 8
     /* ============================================================
        미션 : 장비 대여 신청 폼 검증
 
@@ -488,8 +525,8 @@
        · 먼저 모든 칸에 input 이벤트로 검사를 다세요. (일부러)
        · 이름 칸에 "노" 한 글자만 쳐보세요.
 
-         예상:
-         실제 느낌:
+         예상: 경고뜨지
+         실제 느낌: 경고가뜸.
 
        · 이제 이렇게 바꾸세요.
          1) submit 때 전부
@@ -504,7 +541,7 @@
          input 이 성가신 경우와 input 이 맞는 경우가 같은 화면에 있습니다.
 
        확인 : memo 에 한글을 칠 때, 자음만 친 상태("ㄱ")에서도 숫자가 올라갑니까?
-              답:
+              답: 네
 
        ------------------------------------------------------------
        STEP 8 - (함정) 라디오가 다른 칸의 필수 여부를 바꿉니다
@@ -517,9 +554,9 @@
          2) 입금자명을 비운 채 신청하기 -> 에러가 뜬다
          3) 결제 방법을 카드로 바꾼다
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 값을 비워도 잘 넘어가짐.
+         실제: 값을 비워도 잘 넘어가짐.
+         왜 그런지: 아무런 showError 를 안해서.
 
        · 고치세요.
 
