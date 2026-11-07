@@ -225,6 +225,7 @@
 
     <div class="field">
       <label for="coupon">쿠폰 코드</label>
+      <button type="button" id="check" label="check">쿠폰확인</button>
       <input type="text" id="coupon" name="coupon" placeholder="없으면 비워두세요" required>
       <p class="err" data-for="coupon"></p>
     </div>
@@ -383,7 +384,13 @@
       memo_count.textContent = `${memo.value.length} / 100`
     }
 
-    // step 8
+    let CounponChecked = true
+
+    async function test(data) {
+      const res = await fetch("./coupons.json")
+      const data = await res.json()
+    }
+    test()
     /* ============================================================
        미션 : 장비 대여 신청 폼 검증
 
@@ -614,19 +621,19 @@
 
        · 결제 방법을 아무것도 안 고른 상태로 (검증을 잠깐 끄고) 찍어보세요.
          pay 가 어떻게 나옵니까?
-         답:
+         답: 아무것도 안됨 그냥 신청이됨.
 
        · 동의 체크를 끄고 찍어보세요. agree 가 어떻게 나옵니까?
-         답:
+         답: 대여 규정에 동의해야 합니다. 라고뜸.
 
        · 요청사항에 줄바꿈을 넣어서 찍어보세요. 어떻게 나옵니까?
-         답:
+         답: length 가 1이 참.
 
        · 다 되면, 연락처 칸의 name 속성만 지우고 다시 해보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: ERROR 뜰거같음.
+         실제: TYPE ERROR
+         왜 그런지: NAME 으로 받아서,
 
        · 되돌리세요.
 
