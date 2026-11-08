@@ -226,7 +226,7 @@
     <div class="field">
       <label for="coupon">쿠폰 코드</label>
       <button type="button" id="check" label="check">쿠폰확인</button>
-      <input type="text" id="coupon" name="coupon" placeholder="없으면 비워두세요" required>
+      <input type="text" id="coupon" name="coupon" placeholder="없으면 비워두세요">
       <p class="err" data-for="coupon"></p>
     </div>
 
@@ -383,14 +383,22 @@
     memo.oninput = () => {
       memo_count.textContent = `${memo.value.length} / 100`
     }
-
-    let CounponChecked = true
-
-    async function test(data) {
-      const res = await fetch("./coupons.json")
-      const data = await res.json()
+    const checking = async (e) => {
+      const value = coupon.value.trim()
+      if (!value) return
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        const res = await fetch("./coupons.json")
+        if (!res.ok) return alert("서버 오류")
+        const data = await res.json()
+        const counpon = data.find(e => e.code === value)
+        if (!counpon || data.until > today) throw new Error("없는 쿠폰입니다.");
+        console.log(counpon);
+      } catch (err) {
+        showError('coupon', `${String(err.message)}`)
+      }
     }
-    test()
+    $("#check").addEventListener('click', checking)
     /* ============================================================
        미션 : 장비 대여 신청 폼 검증
 
