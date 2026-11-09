@@ -216,11 +216,85 @@
   <script src="../lib.js"></script>
   <script>
     // ============ 12 - localStorage ============
+    let save = []
 
+const fav = {
+  toggle(i) {
+    save[i].fav ^= 1
+    write("star", save.filter(e => e.fav).map(e => e.id))
+    draw(save)
+  }
+}
+
+const readed = {
+  toggle(i) {
+    save[i].readed ^= 1
+    write("readed", save.filter(e => e.readed).map(e => e.id))
+    draw(save)
+  }
+}
+
+const list = $("#list")
+
+const draw = (l) => {
+  list.innerHTML = l.map((e, i) =>
+    `<li class='card ${e.readed ? "read" : ""}'>
+      ${e.title} /
+      ${e.author} /
+      ${e.category} /
+      ${e.minutes}분
+      <button class='star ${e.fav ? "on" : "off"}' onclick="fav.toggle(${i})">★</button>
+      <label>
+        <input type="checkbox" ${e.readed ? "checked" : ""} onchange="readed.toggle(${i})">
+      </label>
+    </li>`
+  ).join('')
+}
+
+const read = (key) => {
+  try {
+    const data = JSON.parse(localStorage.getItem(key))
+    return Array.isArray(data) ? data : []
+  } catch {
+    return []
+  }
+}
+
+const write = (key, data) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(data))
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+const load = async () => {
+  try {
+    const res = await fetch("./items.json")
+    if (!res.ok) throw new Error("서버 오류")
+
+    const item = await res.json()
+    const stars = read("star")
+    const reads = read("readed")
+
+    save = item.items.map(e => ({
+      ...e,
+      fav: stars.includes(e.id) ? 1 : 0,
+      readed: reads.includes(e.id) ? 1 : 0
+    }))
+
+    draw(save)
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+load()
     /* ============================================================
        미션 : 읽을 거리 보관함
 
        화면 요소   검색      #q
+       
                    분류      #category  (전체 / HTML / CSS / JavaScript / 접근성 / 도구)
                    정렬      #sort      (기본순 / 제목순 / 짧은 것부터 / 긴 것부터)
                    필터 탭    button.tab[data-filter]   (all / fav / unread)
@@ -231,7 +305,14 @@
                              .tab.on(켜진 탭)  .empty(결과 없음)   이미 있습니다
        데이터      items.json   20개  (id / title / author / category / minutes)
 
-       HTML 과 CSS 는 다 만들어놨습니다. JS 만 쓰면 됩니다.
+       바깥 틀과 CSS 는 다 만들어놨습니다.
+       검색, 분류, 정렬, 필터 탭, 초기화 버튼, 요약 자리, 목록 껍데기(#list) 가
+       HTML 에 이미 있습니다.
+
+       카드 안쪽은 없습니다. #list 안에 들어갈 HTML 은 items.json 을 읽어서
+       직접 만들어 넣습니다. 별 버튼과 읽음 체크도 그때 같이 만드는 것입니다.
+       CSS 는 .card / .card.read / .star / .star.on / .empty 까지 다 준비해놨으니
+       클래스 이름만 맞추면 모양은 알아서 나옵니다.
 
        STEP 하나씩 하고 보여주세요. 한 번에 다 하면 어디서 틀렸는지 못 찾습니다.
        끝낸 STEP 은 주석으로 바꿔서 아래에 쌓아두세요.
@@ -271,9 +352,9 @@
 
        · 새로고침하고 저장된 값을 꺼내보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 저장 잘됨.
+         실제: 저장 잘됨.
+         왜 그런지: 내가 localstorage.setitem("star")로 빈 로컬을 만들고 밑에 로딩함수에서 save(전역변수) 로 save 에서 필터된거를 받아서 해석하고 star 받고 출력하게함..
 
        · 고치세요. 넣을 때와 꺼낼 때 각각 한 번씩 거쳐야 합니다.
 
@@ -285,9 +366,9 @@
        ------------------------------------------------------------
        · Application 탭에서 저장값을 지우고 새로고침하세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: ["a1","a2"]
+         실제: ["a1","a2"]
+         왜 그런지: ["a1","a2"]
 
        · 이번엔 저장값을 abc 로 바꿔놓고 새로고침하세요.
 

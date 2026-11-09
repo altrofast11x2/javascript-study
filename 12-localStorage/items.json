@@ -1,24 +1,184 @@
 {
   "items": [
-    { "id": "a1",  "title": "시맨틱 태그를 왜 쓰는가",        "author": "김서현", "category": "HTML",       "minutes": 6 },
-    { "id": "a2",  "title": "label 과 for 의 관계",            "author": "박도윤", "category": "HTML",       "minutes": 4 },
-    { "id": "a3",  "title": "table 을 레이아웃에 쓰지 않는 이유", "author": "이지우", "category": "HTML",     "minutes": 9 },
-    { "id": "a4",  "title": "meta 태그 정리",                  "author": "최민서", "category": "HTML",       "minutes": 12 },
-    { "id": "b1",  "title": "flex 와 grid 중 무엇을 쓸까",      "author": "정하윤", "category": "CSS",        "minutes": 15 },
-    { "id": "b2",  "title": "margin 이 겹치는 현상",            "author": "김서현", "category": "CSS",        "minutes": 7 },
-    { "id": "b3",  "title": "position sticky 의 조건",          "author": "강수아", "category": "CSS",        "minutes": 5 },
-    { "id": "b4",  "title": "커스텀 속성으로 테마 만들기",      "author": "박도윤", "category": "CSS",        "minutes": 18 },
-    { "id": "b5",  "title": "transition 과 animation 의 차이",  "author": "이지우", "category": "CSS",        "minutes": 11 },
-    { "id": "c1",  "title": "이벤트 위임 한 번에 이해하기",      "author": "정하윤", "category": "JavaScript", "minutes": 13 },
-    { "id": "c2",  "title": "async 와 await 의 순서",           "author": "최민서", "category": "JavaScript", "minutes": 20 },
-    { "id": "c3",  "title": "배열 메서드 고르는 기준",          "author": "강수아", "category": "JavaScript", "minutes": 16 },
-    { "id": "c4",  "title": "localStorage 에 객체 넣기",        "author": "김서현", "category": "JavaScript", "minutes": 8 },
-    { "id": "c5",  "title": "폼 검증을 직접 만들 때",           "author": "박도윤", "category": "JavaScript", "minutes": 22 },
-    { "id": "c6",  "title": "fetch 가 실패하는 네 가지 경우",    "author": "이지우", "category": "JavaScript", "minutes": 10 },
-    { "id": "d1",  "title": "스크린리더가 읽는 순서",           "author": "강수아", "category": "접근성",     "minutes": 14 },
-    { "id": "d2",  "title": "alt 를 비워야 할 때",              "author": "정하윤", "category": "접근성",     "minutes": 3 },
-    { "id": "d3",  "title": "키보드만으로 사이트 쓰기",         "author": "최민서", "category": "접근성",     "minutes": 17 },
-    { "id": "e1",  "title": "개발자도구 Elements 탭 제대로 쓰기", "author": "김서현", "category": "도구",     "minutes": 19 },
-    { "id": "e2",  "title": "Lighthouse 점수 올리는 순서",      "author": "박도윤", "category": "도구",       "minutes": 25 }
+    {
+      "id": "a1",
+      "title": "시맨틱 태그를 왜 쓰는가",
+      "author": "김서현",
+      "category": "HTML",
+      "minutes": 6,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "a2",
+      "title": "label 과 for 의 관계",
+      "author": "박도윤",
+      "category": "HTML",
+      "minutes": 4,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "a3",
+      "title": "table 을 레이아웃에 쓰지 않는 이유",
+      "author": "이지우",
+      "category": "HTML",
+      "minutes": 9,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "a4",
+      "title": "meta 태그 정리",
+      "author": "최민서",
+      "category": "HTML",
+      "minutes": 12,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "b1",
+      "title": "flex 와 grid 중 무엇을 쓸까",
+      "author": "정하윤",
+      "category": "CSS",
+      "minutes": 15,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "b2",
+      "title": "margin 이 겹치는 현상",
+      "author": "김서현",
+      "category": "CSS",
+      "minutes": 7,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "b3",
+      "title": "position sticky 의 조건",
+      "author": "강수아",
+      "category": "CSS",
+      "minutes": 5,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "b4",
+      "title": "커스텀 속성으로 테마 만들기",
+      "author": "박도윤",
+      "category": "CSS",
+      "minutes": 18,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "b5",
+      "title": "transition 과 animation 의 차이",
+      "author": "이지우",
+      "category": "CSS",
+      "minutes": 11,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "c1",
+      "title": "이벤트 위임 한 번에 이해하기",
+      "author": "정하윤",
+      "category": "JavaScript",
+      "minutes": 13,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "c2",
+      "title": "async 와 await 의 순서",
+      "author": "최민서",
+      "category": "JavaScript",
+      "minutes": 20,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "c3",
+      "title": "배열 메서드 고르는 기준",
+      "author": "강수아",
+      "category": "JavaScript",
+      "minutes": 16,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "c4",
+      "title": "localStorage 에 객체 넣기",
+      "author": "김서현",
+      "category": "JavaScript",
+      "minutes": 8,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "c5",
+      "title": "폼 검증을 직접 만들 때",
+      "author": "박도윤",
+      "category": "JavaScript",
+      "minutes": 22,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "c6",
+      "title": "fetch 가 실패하는 네 가지 경우",
+      "author": "이지우",
+      "category": "JavaScript",
+      "minutes": 10,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "d1",
+      "title": "스크린리더가 읽는 순서",
+      "author": "강수아",
+      "category": "접근성",
+      "minutes": 14,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "d2",
+      "title": "alt 를 비워야 할 때",
+      "author": "정하윤",
+      "category": "접근성",
+      "minutes": 3,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "d3",
+      "title": "키보드만으로 사이트 쓰기",
+      "author": "최민서",
+      "category": "접근성",
+      "minutes": 17,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "e1",
+      "title": "개발자도구 Elements 탭 제대로 쓰기",
+      "author": "김서현",
+      "category": "도구",
+      "minutes": 19,
+      "fav": 0,
+      "readed": 0
+    },
+    {
+      "id": "e2",
+      "title": "Lighthouse 점수 올리는 순서",
+      "author": "박도윤",
+      "category": "도구",
+      "minutes": 25,
+      "fav": 0,
+      "readed": 0
+    }
   ]
 }
