@@ -346,6 +346,12 @@
         drawCart()
       }
     }
+    remove = (id) => {
+      save = save.filter(e => e.id !== id)
+      write(cart, save)
+      drawList(productss)
+      drawCart()
+    }
     const load = async () => {
       try {
         const res = await fetch("./products.json")
@@ -362,6 +368,8 @@
       }
     }
     load()
+
+
 
     /* ============================================================
        미션 : 문구점 장바구니
