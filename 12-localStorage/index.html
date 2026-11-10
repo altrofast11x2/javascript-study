@@ -338,6 +338,14 @@
         write("cart", save)
         drawList(product)
         drawCart()
+      },
+      remove(id) {
+        save = save.filter(e => e.id !== id)
+        summary.textContent = save.length
+        total.textContent = save.reduce((sum, e) => sum + e.qty, 0)
+        write("cart", save)
+        drawList(product)
+        drawCart()
       }
     }
     const drawList = (c_list) => {
@@ -374,6 +382,7 @@
           </div>
             <p class="price">${item.price.toLocaleString("ko-KR")}원</p>
             <p>${e.qty}개</p>
+            <button onclick="put.remove('${e.id}')">삭제</button>
         </li>`
       }).join('')
     }
@@ -413,6 +422,8 @@
     kind.onchange = drawFilter
     sort.onchange = drawFilter
     soldout.onchange = drawFilter
+
+
     /* ============================================================
        미션 : 문구점 장바구니
 
@@ -556,9 +567,9 @@
            li.remove() 처럼 화면만 건드리는 것입니다.
          그러고 나서 #total 과 #summary 를 보세요. 새로고침도 해보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 로컬에는 아직 살아있어서 토털이랑 서머리가 안없어짐.
+         실제: 로컬에는 아직 살아있어서 토털이랑 서머리가 안없어짐.
+         왜 그런지: 로컬에는 아직 살아있어서 토털이랑 서머리가 안없어짐.
 
        · 고치세요. 순서를 하나로 고정합니다.
 
