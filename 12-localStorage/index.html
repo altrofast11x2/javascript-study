@@ -292,6 +292,9 @@
     const list = $("#list")
     const cart = $("#cart")
     const clear = $("#clear")
+    const summary = $("#summary")
+    const soldout = $("#soldout")
+    const total = $("#total")
     const read = (key, fallback = []) => {
       try {
         const data = JSON.parse(localStorage.getItem(key)) ?? fallback
@@ -309,15 +312,33 @@
     }
     const put = {
       add(id) {
-        const old = save.find(e => e.id === id)
-        if (old) old.qty++
+        const already = save.find(e => e.id === id)
+        if (already) already.qty++
         else save.push({ id, qty: 1 })
+        write("cart", save)
+        drawList(product)
+        drawCart()
+      },
+      minus(id) {
+        const that = save.find(e => e.id === id)
+        if (!that || that.qty <= 1) return
+        that.qty--
+        write("cart", save)
+        drawList(product)
+        drawCart()
+      },
+      plus(id) {
+        const that = save.find(e => e.id === id)
+        const item = product.find(e => e.id === id)
+        if (!that || !item || that.qty >= item.stock) return
+        that.qty++
         write("cart", save)
         drawList(product)
         drawCart()
       }
     }
     const drawList = (c_list) => {
+      if (!c_list) return
       list.innerHTML = c_list.map((e, i) => {
         return `
         <li class="card ${!e.stock ? "soldout" : ""} ${save.some(s => s.id === e.id) ? "in" : ""}>
@@ -326,22 +347,31 @@
             <p class="meta">${e.brand} / ${e.kind} / 재고 ${e.stock}개</p>
           </div>
           <p>${e.price.toLocaleString('kr-KR')}원</p>
+          <button onclick="put.plus('${e.id}')">+</button>
           <button onclick="put.add('${e.id}')" ${e.stock ? "" : "disabled"}>담기</button>
+          <button onclick="put.minus('${e.id}')">-</button>
         </li>`
       }).join('')
     }
     const drawCart = () => {
+      if (!save.length) {
+        cart.innerHTML = `<li class="empty">장바구니가 비어 있습니다.</li>`
+        return
+      }
       cart.innerHTML = save.map((e, i) => {
         const item = product.find(p => p.id === e.id)
+        if (!item) return
+        summary.textContent = save.length
+        total.textContent = save.reduce((sum, e) => sum + e.qty, 0)
         return `
-          <li class="line">
-            <div class="body">
-              <p class="title">${item.name}</p>
-              <p class="meta">${item.brand}</p>
-            </div>
+        <li class="line">
+          <div class="body">
+            <p class="title">${item.name}</p>
+            <p class="meta">${item.brand}</p>
+          </div>
             <p class="price">${item.price.toLocaleString("ko-KR")}원</p>
             <p>${e.qty}개</p>
-          </li>`
+        </li>`
       }).join('')
     }
     const load = async () => {
@@ -360,9 +390,18 @@
     load()
     clear.onclick = () => {
       save = [];
+      summary.textContent = save.length
+      total.textContent = save.reduce((sum, e) => sum + e.qty, 0)
       write("cart", save)
       drawCart(product)
       drawList()
+    }
+    soldout.onchange = e => {
+      let filtered = product
+      if (soldout.checked) {
+        filtered = product.filter(e => e.stock > 0)
+      }
+      drawList(filtered)
     }
     /* ============================================================
        미션 : 문구점 장바구니
@@ -485,15 +524,15 @@
          products.json 에 없는 id 로 넣습니다. (예: zzz 를 2개)
          그리고 새로고침하세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 당근 지워지지.
+         실제: 왜냐면 넣을때
+         왜 그런지: 잘됨 왜냐면 save 에 id 를 넣어서 저장하기 때문이야 product.json 은 별개로 fetch 한거라서.
 
        · 고치세요. 저장소에서 꺼낸 값은 남이 써놓은 값이라고 생각하고 다뤄야 합니다.
 
        확인 : 재고가 2개인 상품인데 저장값에 수량이 99 로 적혀 있으면
               화면에 몇 개로 보여야 맞습니까? 왜 그렇습니까?
-              답:
+              답: 1개, 왜냐니 니가 만들라는대로 만들었으니까그런거야
 
        ------------------------------------------------------------
        STEP 5 - (함정) 화면을 손으로 고치면
