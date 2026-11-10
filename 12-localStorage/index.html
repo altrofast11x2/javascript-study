@@ -103,11 +103,26 @@
     }
 
     /* ---------- 최근 본 상품 ---------- */
-    .recent {
-      font-size: 12px;
-      color: #888;
+    .recentrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 10px;
       min-height: 26px;
+    }
+
+    .recentlabel {
+      font-size: 12px;
+      color: #777;
+      white-space: nowrap;
+    }
+
+    /* 칩이 들어가는 칸. 여기에 .chip 을 그려 넣습니다 */
+    .recent {
+      flex: 1;
+      min-width: 0;
+      font-size: 12px;
+      color: #888;
       display: flex;
       align-items: center;
       gap: 5px;
@@ -267,7 +282,10 @@
       <label class="check"><input type="checkbox" id="soldout"> 품절 숨기기</label>
     </div>
 
-    <p class="recent" id="recent"></p>
+    <div class="recentrow">
+      <span class="recentlabel">최근 본</span>
+      <p class="recent" id="recent"></p>
+    </div>
     <p id="summary"></p>
 
     <div class="cols">
@@ -287,142 +305,266 @@
   <script src="../lib.js"></script>
   <script>
     // ============ 12 - localStorage ============
-    let save = [];
-    let product = [];
+
+    // 저장소에 들어가는 키는 전부 이 접두어를 달고 들어간다.
+    // 비우기에서 이것만 골라 지우면 남의 키는 건드리지 않는다.
+    const PRE = "study12:"
+
+    let product = []    // products.json 원본. 저장소에 절대 넣지 않는다
+    let save = []       // 내가 담은 것   [{ id, qty }] 만
+    let recent = []     // 최근 본 id     ["p06", "p05", ...]
+    let filter = { q: "", kind: "", sort: "default", soldout: false }
+
     const list = $("#list")
     const cart = $("#cart")
-    const clear = $("#clear")
+    const recentBox = $("#recent")
     const summary = $("#summary")
-    const soldout = $("#soldout")
     const total = $("#total")
-    const sort = $("#sort")
-    const kind = $("#kind")
+    const clearBtn = $("#clear")
     const q = $("#q")
-    const read = (key, fallback = []) => {
+    const kind = $("#kind")
+    const sort = $("#sort")
+    const soldout = $("#soldout")
+
+    /* ---------- 저장소 ----------
+       getItem / setItem 은 이 두 함수 안에만 있다.
+       store 를 넘기면 sessionStorage 에도 같은 함수를 쓴다. */
+    const read = (key, fallback, store = localStorage) => {
       try {
-        const data = JSON.parse(localStorage.getItem(key)) ?? fallback
-        return Array.isArray(data) ? data : fallback
+        const data = JSON.parse(store.getItem(PRE + key))
+        if (data === null || data === undefined) return fallback   // 처음 온 사람
+        if (typeof data !== "object") return fallback              // 숫자/문자가 들어있음
+        if (Array.isArray(fallback) !== Array.isArray(data)) return fallback  // 모양이 다름
+        return data
       } catch (error) {
-        return fallback
+        return fallback                                            // abc 같은 깨진 값
       }
     }
-    const write = (key, data) => {
+
+    const write = (key, data, store = localStorage) => {
       try {
-        localStorage.setItem(key, JSON.stringify(data))
+        store.setItem(PRE + key, JSON.stringify(data))
       } catch (error) {
-        console.log(error.message);
+        console.error("저장 실패 :", error.message)                // 5MB 넘침 등
       }
     }
-    const put = {
-      add(id) {
-        const already = save.find(e => e.id === id)
-        if (already) already.qty++
-        else save.push({ id, qty: 1 })
-        write("cart", save)
-        drawList(product)
-        drawCart()
-      },
-      minus(id) {
-        const that = save.find(e => e.id === id)
-        if (!that || that.qty <= 1) return
-        that.qty--
-        write("cart", save)
-        drawList(product)
-        drawCart()
-      },
-      plus(id) {
-        const that = save.find(e => e.id === id)
-        const item = product.find(e => e.id === id)
-        if (!that || !item || that.qty >= item.stock) return
-        that.qty++
-        write("cart", save)
-        drawList(product)
-        drawCart()
-      },
-      remove(id) {
-        save = save.filter(e => e.id !== id)
-        summary.textContent = save.length
-        total.textContent = save.reduce((sum, e) => sum + e.qty, 0)
-        write("cart", save)
-        drawList(product)
-        drawCart()
-      }
+
+    /* ---------- 꺼낸 값 청소 ----------
+       저장소에서 꺼낸 값은 남이 써놓은 값이다.
+       없는 상품, 품절, 이상한 수량, 중복 id 를 여기서 전부 걸러낸다. */
+    const clean = (rows) => {
+      const out = []
+      rows.forEach(row => {
+        if (!row || typeof row !== "object") return
+        const item = product.find(p => p.id === row.id)
+        if (!item || item.stock < 1) return                 // products.json 에 없거나 품절
+        if (out.some(o => o.id === row.id)) return          // 같은 id 가 두 번
+        const num = Math.floor(Number(row.qty)) || 1
+        out.push({ id: row.id, qty: Math.min(Math.max(num, 1), item.stock) })
+      })
+      return out
     }
-    const drawList = (c_list) => {
-      if (!c_list) return
-      list.innerHTML = c_list.map((e, i) => {
-        return `
-        <li class="card ${!e.stock ? "soldout" : ""} ${save.some(s => s.id === e.id) ? "in" : ""}>
+
+    /* ---------- 화면 그리기 ----------
+       화면을 건드리는 코드는 아래 그리기 함수들 안에만 있다. */
+    const money = (n) => n.toLocaleString("ko-KR") + "원"
+
+    const visible = () => {
+      let copy = [...product]
+      const word = filter.q.trim().toLowerCase()
+      if (word) copy = copy.filter(e =>
+        e.name.toLowerCase().includes(word) || e.brand.toLowerCase().includes(word))
+      if (filter.kind) copy = copy.filter(e => e.kind === filter.kind)
+      if (filter.soldout) copy = copy.filter(e => e.stock > 0)
+      if (filter.sort === "name") copy.sort((a, b) => a.name.localeCompare(b.name, "ko-KR"))
+      if (filter.sort === "cheap") copy.sort((a, b) => a.price - b.price)
+      if (filter.sort === "expensive") copy.sort((a, b) => b.price - a.price)
+      return copy
+    }
+
+    const drawList = (rows) => {
+      if (!rows.length) {
+        list.innerHTML = `<li class="empty">조건에 맞는 상품이 없습니다.</li>`
+        return
+      }
+      list.innerHTML = rows.map(e => `
+        <li class="card ${e.stock ? "" : "soldout"} ${save.some(s => s.id === e.id) ? "in" : ""}">
           <div class="body">
-            <p class="title">${e.name}</p>
+            <p class="title" onclick="viewer.view('${e.id}')">${e.name}</p>
             <p class="meta">${e.brand} / ${e.kind} / 재고 ${e.stock}개</p>
           </div>
-          <p>${e.price.toLocaleString('kr-KR')}원</p>
-          <button onclick="put.plus('${e.id}')">+</button>
+          <p class="price">${money(e.price)}</p>
           <button onclick="put.add('${e.id}')" ${e.stock ? "" : "disabled"}>담기</button>
-          <button onclick="put.minus('${e.id}')">-</button>
-        </li>`
-      }).join('')
+        </li>`).join("")
     }
+
     const drawCart = () => {
       if (!save.length) {
         cart.innerHTML = `<li class="empty">장바구니가 비어 있습니다.</li>`
         return
       }
-      cart.innerHTML = save.map((e, i) => {
-        const item = product.find(p => p.id === e.id)
-        if (!item) return
-        summary.textContent = save.length
-        total.textContent = save.reduce((sum, e) => sum + e.qty, 0)
+      // save 는 clean 을 통과한 값이라 find 가 반드시 찾는다
+      cart.innerHTML = save.map(s => {
+        const item = product.find(p => p.id === s.id)
         return `
         <li class="line">
           <div class="body">
             <p class="title">${item.name}</p>
-            <p class="meta">${item.brand}</p>
+            <p class="meta">${item.brand} / ${money(item.price)}</p>
           </div>
-            <p class="price">${item.price.toLocaleString("ko-KR")}원</p>
-            <p>${e.qty}개</p>
-            <button onclick="put.remove('${e.id}')">삭제</button>
+          <div class="qty">
+            <button onclick="put.minus('${s.id}')">-</button>
+            <span>${s.qty}</span>
+            <button onclick="put.plus('${s.id}')">+</button>
+          </div>
+          <p class="price">${money(item.price * s.qty)}</p>
+          <button class="del" onclick="put.remove('${s.id}')">X</button>
         </li>`
-      }).join('')
+      }).join("")
     }
+
+    const drawRecent = () => {
+      recentBox.innerHTML = recent.map(id => {
+        const item = product.find(p => p.id === id)
+        return item ? `<span class="chip">${item.name}</span>` : ""
+      }).join("")
+    }
+
+    const drawSummary = (rows) => {
+      const count = save.reduce((sum, s) => sum + s.qty, 0)
+      const won = save.reduce((sum, s) =>
+        sum + product.find(p => p.id === s.id).price * s.qty, 0)
+      summary.textContent =
+        `상품 ${product.length}개 중 ${rows.length}개 표시 / 장바구니 ${save.length}종 ${count}개`
+      total.textContent = `합계 ${money(won)}`
+    }
+
+    // 데이터가 바뀌면 이것만 부른다
+    const render = () => {
+      const rows = visible()
+      drawList(rows)
+      drawCart()
+      drawRecent()
+      drawSummary(rows)
+    }
+
+    /* ---------- 장바구니 ----------
+       순서를 하나로 고정한다 : 데이터를 고치고 -> 저장하고 -> 다시 그린다 */
+    const put = {
+      add(id) {
+        const item = product.find(p => p.id === id)
+        if (!item || item.stock < 1) return          // 품절은 담을 수 없다
+        const already = save.find(s => s.id === id)
+        if (already) {
+          if (already.qty >= item.stock) return      // 재고까지만
+          already.qty++
+        } else {
+          save.push({ id, qty: 1 })                  // 이름과 가격은 넣지 않는다
+        }
+        this.done()
+      },
+      plus(id) {
+        const s = save.find(e => e.id === id)
+        const item = product.find(p => p.id === id)
+        if (!s || !item || s.qty >= item.stock) return
+        s.qty++
+        this.done()
+      },
+      minus(id) {
+        const s = save.find(e => e.id === id)
+        if (!s || s.qty <= 1) return                 // 1 보다 작아지지 않는다
+        s.qty--
+        this.done()
+      },
+      remove(id) {
+        save = save.filter(e => e.id !== id)
+        this.done()
+      },
+      done() {
+        write("cart", save)
+        render()
+      }
+    }
+
+    /* ---------- 최근 본 상품 ----------
+       sessionStorage 다. 이 탭에서만 의미가 있는 값이라서 그렇다.
+       장바구니는 다음에 와서도 남아야 하니까 localStorage. */
+    const viewer = {
+      view(id) {
+        recent = [id, ...recent.filter(e => e !== id)].slice(0, 5)   // 중복 제거 + 최신 앞 + 5개
+        write("recent", recent, sessionStorage)
+        render()
+      }
+    }
+
+    /* ---------- 검색 / 분류 / 정렬 / 품절 숨기기 ----------
+       고른 것도 저장한다. 등록은 함수 밖, 최상단에서 한 번만. */
+    const pick = () => {
+      filter = { q: q.value, kind: kind.value, sort: sort.value, soldout: soldout.checked }
+      write("filter", filter)
+      render()
+    }
+    q.oninput = pick
+    kind.onchange = pick
+    sort.onchange = pick
+    soldout.onchange = pick
+
+    // 저장된 선택을 화면 칸에 되돌려 놓는다
+    const fillForm = () => {
+      q.value = filter.q ?? ""
+      kind.value = filter.kind ?? ""
+      sort.value = filter.sort ?? "default"
+      soldout.checked = !!filter.soldout
+    }
+
+    /* ---------- 비우기 ----------
+       clear() 는 이 사이트의 다른 키까지 다 날린다.
+       접두어가 붙은 내 키만 골라서 지운다. */
+    clearBtn.onclick = () => {
+      if (!confirm("장바구니와 검색 조건을 모두 지울까요? 되돌릴 수 없습니다.")) return
+      Object.keys(localStorage)
+        .filter(key => key.startsWith(PRE))
+        .forEach(key => localStorage.removeItem(key))
+      save = []
+      filter = { q: "", kind: "", sort: "default", soldout: false }
+      fillForm()
+      render()
+      // 최근 본 것은 sessionStorage 라서 탭을 닫으면 어차피 사라진다. 그대로 둔다
+    }
+
+    /* ---------- 다른 탭 ----------
+       storage 는 "다른" 탭에서만 울린다. 저장한 그 탭에서는 울리지 않는다.
+       그래서 위의 put / pick 은 직접 render 를 부르고, 여기는 다시 읽고 그린다. */
+    window.addEventListener("storage", (e) => {
+      if (e.storageArea !== localStorage) return
+      if (e.key !== null && !e.key.startsWith(PRE)) return   // 남의 키는 무시
+      save = clean(read("cart", []))
+      filter = read("filter", { q: "", kind: "", sort: "default", soldout: false })
+      fillForm()
+      render()
+    })
+
+    /* ---------- 시작 ---------- */
     const load = async () => {
       try {
         const res = await fetch("./products.json")
-        if (!res.ok) throw new Error("서버 오류");
+        if (!res.ok) throw new Error("상품 목록을 불러오지 못했습니다.")
         const data = await res.json()
-        product = data.products
-        save = read("cart")
-        drawList(product)
-        drawCart()
+        product = data.products                  // 바깥이 배열이 아니라 객체다
+
+        save = clean(read("cart", []))
+        write("cart", save)                      // 청소한 결과를 되돌려 저장한다
+        recent = read("recent", [], sessionStorage)
+          .filter(id => product.some(p => p.id === id))
+        filter = read("filter", filter)
+        fillForm()
+        render()
       } catch (error) {
-        console.log(error.message);
+        list.innerHTML = `<li class="empty">${error.message}</li>`
+        console.error(error)
       }
     }
     load()
-    clear.onclick = () => {
-      save = [];
-      summary.textContent = save.length
-      total.textContent = save.reduce((sum, e) => sum + e.qty, 0)
-      write("cart", save)
-      drawCart(product)
-      drawList()
-    }
-    const drawFilter = () => {
-      let copy = [...product]
-      if (q.value) copy = copy.filter(e => e.name.includes(q.value) || e.brand.includes(q.value))
-      if (kind.value) copy = copy.filter(e => e.kind === kind.value)
-      if (soldout.checked) copy = copy.filter(e => e.stock > 0)
-      if (sort.value === 'name') copy = copy.sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'))
-      if (sort.value === 'cheap') copy = copy.sort((a, b) => a.price - b.price)
-      if (sort.value === 'expensive') copy = copy.sort((a, b) => b.price - a.price)
-      drawList(copy)
-    }
-    q.oninput = drawFilter
-    kind.onchange = drawFilter
-    sort.onchange = drawFilter
-    soldout.onchange = drawFilter
-
 
     /* ============================================================
        미션 : 문구점 장바구니
@@ -589,9 +731,9 @@
        · 저장하고 같은 탭에서 새로고침해보세요. 그 다음 같은 페이지를
          새 탭으로 열어보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 내가 연 탭에서만 최근 본 페이지가 적용되고 같은 페이지를 새탭으로 열면 새로운 session 으로 시작할거같음.
+         실제: 내가 연 탭에서만 최근 본 페이지가 적용되고 같은 페이지를 새탭으로 열면 새로운 session 으로 시작함
+         왜 그런지: sessionStorage 는 페이지마다 다르게 되어있어서.
 
        · 검색어, 분류, 정렬, 품절 숨기기도 새로고침하면 그대로 남아 있게 하세요.
          이건 localStorage 입니다.
@@ -610,18 +752,18 @@
          Application 탭에서 다른 키를 하나 직접 넣어두고 (예: test / 1)
          비우기를 눌러보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 다 없어짐
+         실제: 다 없어짐
+         왜 그런지: 다 없어짐
 
        · 고치세요. 내가 저장한 것만 지워야 합니다.
 
        · 같은 페이지를 탭 두 개에 열고, 한쪽에서 상품을 담으세요.
          다른 쪽 탭을 보세요.
 
-         예상:
-         실제:
-         왜 그런지:
+         예상: 아무것도 안바뀌는데 새로고침하면 바뀜.
+         실제: 아무것도 안바뀌는데 새로고침하면 바뀜.
+         왜 그런지: 아무것도 안바뀌는데 새로고침하면 바뀜.
 
        · 고치세요.
 
