@@ -295,6 +295,9 @@
     const summary = $("#summary")
     const soldout = $("#soldout")
     const total = $("#total")
+    const sort = $("#sort")
+    const kind = $("#kind")
+    const q = $("#q")
     const read = (key, fallback = []) => {
       try {
         const data = JSON.parse(localStorage.getItem(key)) ?? fallback
@@ -396,13 +399,20 @@
       drawCart(product)
       drawList()
     }
-    soldout.onchange = e => {
-      let filtered = product
-      if (soldout.checked) {
-        filtered = product.filter(e => e.stock > 0)
-      }
-      drawList(filtered)
+    const drawFilter = () => {
+      let copy = [...product]
+      if (q.value) copy = copy.filter(e => e.name.includes(q.value) || e.brand.includes(q.value))
+      if (kind.value) copy = copy.filter(e => e.kind === kind.value)
+      if (soldout.checked) copy = copy.filter(e => e.stock > 0)
+      if (sort.value === 'name') copy = copy.sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'))
+      if (sort.value === 'cheap') copy = copy.sort((a, b) => a.price - b.price)
+      if (sort.value === 'expensive') copy = copy.sort((a, b) => b.price - a.price)
+      drawList(copy)
     }
+    q.oninput = drawFilter
+    kind.onchange = drawFilter
+    sort.onchange = drawFilter
+    soldout.onchange = drawFilter
     /* ============================================================
        미션 : 문구점 장바구니
 
