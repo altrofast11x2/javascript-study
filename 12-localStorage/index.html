@@ -287,12 +287,12 @@
   <script src="../lib.js"></script>
   <script>
     // ============ 12 - localStorage ============
-    let save = []
-    let productss = []
-    const cart = $("#cart")
+    let save = [];
+    let product = [];
     const list = $("#list")
-    const soldout = $("#soldout")
-    function read(key, fallback = []) {
+    const cart = $("#cart")
+    const clear = $("#clear")
+    const read = (key, fallback = []) => {
       try {
         const data = JSON.parse(localStorage.getItem(key)) ?? fallback
         return Array.isArray(data) ? data : fallback
@@ -300,77 +300,70 @@
         return fallback
       }
     }
-    function write(key, data) {
+    const write = (key, data) => {
       try {
         localStorage.setItem(key, JSON.stringify(data))
       } catch (error) {
-        return console.log(error.message);
+        console.log(error.message);
       }
     }
-    const drawList = (p) => {
-      list.innerHTML = p.map((e, i) => `
-      <li class="card ${!e.stock ? "soldout" : ""} ${save.some(s => s.id === e.id) ? "in" : ""}">
-          <div class="body">
-            <p class="">${e.name}</p>
-            <p class="">${e.brand} / ${e.kind} / 재고 ${e.stock}개</p>
-          </div>
-          <p class="price">${e.price.toLocaleString('ko-KR')}원</p>
-          <button onclick="take.add('${e.id}')" ${!e.stock ? "disabled" : ""}>담기</button>
-      </li>
-      `).join('')
-    }
-    const drawCart = () => {
-      cart.innerHTML = save.map(e => {
-        const item = products.find(p => p.id === e.id)
-        if (!item) return
-        return `
-        <li class="line">
-            <div class="body">
-              <p class="">${item.name}</p>
-              <p class="price">${item.price.toLocaleString('ko-KR')}원</p>
-            </div>
-            <span>${e.qty}개</span>
-        </li>`
-      }).join('')
-      if (!save.length) {
-        cart.innerHTML = `<li class="empty">장바구니가 비어 있습니다.</li>`
-      }
-    }
-    const take = {
+    const put = {
       add(id) {
-        const item = products.find(e => e.id === id)
-        if (!item || item.stock <= 0) return
-        save.push({ id, qty: 1 })
+        const old = save.find(e => e.id === id)
+        if (old) old.qty++
+        else save.push({ id, qty: 1 })
         write("cart", save)
-        drawList(products)
+        drawList(product)
         drawCart()
       }
     }
-    remove = (id) => {
-      save = save.filter(e => e.id !== id)
-      write(cart, save)
-      drawList(productss)
-      drawCart()
+    const drawList = (c_list) => {
+      list.innerHTML = c_list.map((e, i) => {
+        return `
+        <li class="card ${!e.stock ? "soldout" : ""} ${save.some(s => s.id === e.id) ? "in" : ""}>
+          <div class="body">
+            <p class="title">${e.name}</p>
+            <p class="meta">${e.brand} / ${e.kind} / 재고 ${e.stock}개</p>
+          </div>
+          <p>${e.price.toLocaleString('kr-KR')}원</p>
+          <button onclick="put.add('${e.id}')" ${e.stock ? "" : "disabled"}>담기</button>
+        </li>`
+      }).join('')
+    }
+    const drawCart = () => {
+      cart.innerHTML = save.map((e, i) => {
+        const item = product.find(p => p.id === e.id)
+        return `
+          <li class="line">
+            <div class="body">
+              <p class="title">${item.name}</p>
+              <p class="meta">${item.brand}</p>
+            </div>
+            <p class="price">${item.price.toLocaleString("ko-KR")}원</p>
+            <p>${e.qty}개</p>
+          </li>`
+      }).join('')
     }
     const load = async () => {
       try {
         const res = await fetch("./products.json")
-        if (!res.ok) throw new Error("서버 오류")
-
+        if (!res.ok) throw new Error("서버 오류");
         const data = await res.json()
-        products = data.products
+        product = data.products
         save = read("cart")
-
-        drawList(products)
+        drawList(product)
         drawCart()
       } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
       }
     }
     load()
-
-
-
+    clear.onclick = () => {
+      save = [];
+      write("cart", save)
+      drawCart(product)
+      drawList()
+    }
     /* ============================================================
        미션 : 문구점 장바구니
 
