@@ -46,18 +46,46 @@
         const
           barW = (w - padding * 2 - (data.length - 1) * gap) / data.length,
           scale = (h - padding * 2) / Math.max(...data)
-        ctx.beginPath()
-        data.forEach((value, i) => {
+        // 좌표를 먼저 한 번만 계산해 둔다. 아래 네 단계가 같은 값을 쓴다
+        const points = data.map((value, i) => {
           const barH = scale * value * eased
-          const
-            x = padding + i * (barW + gap) + barW / 2,
-            y = h - padding - barH
-          if (i === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-          ctx.fillRect(padding + i * (barW + gap), y, barW, barH)
-          ctx.arc(x, y, 10, 0, Math.PI * 2)
-        });
+          return {
+            left: padding + i * (barW + gap),            // 막대 왼쪽
+            top: h - padding - barH,                     // 막대 위쪽 = 점의 y
+            x: padding + i * (barW + gap) + barW / 2,    // 막대 가운데
+            barH
+          }
+        })
+
+        // 1) 막대 - fillRect 는 path 를 쓰지 않으니 beginPath 가 필요 없다
+        ctx.fillStyle = '#4a7'
+        points.forEach(p => ctx.fillRect(p.left, p.top, barW, p.barH))
+
+        // 2) 꺾은선 - 선은 이어져야 하니까 path 하나로 그린다
+        ctx.beginPath()
+        points.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(p.x, p.top)
+          else ctx.lineTo(p.x, p.top)
+        })
+        ctx.strokeStyle = '#c33'
+        ctx.lineWidth = 2
         ctx.stroke()
+
+        // 3) 점 - 점마다 beginPath 를 다시 해야 한다.
+        //    안 하면 위의 선과 앞의 점들이 전부 한 path 로 이어져서
+        //    원 사이사이가 직선으로 연결된 거미줄이 된다
+        ctx.fillStyle = '#c33'
+        points.forEach(p => {
+          ctx.beginPath()
+          ctx.arc(p.x, p.top, 5, 0, Math.PI * 2)
+          ctx.fill()
+        })
+
+        // 4) 이름 - label 을 만들어 놓고 안 쓰고 있었다
+        ctx.fillStyle = '#333'
+        ctx.font = '12px sans-serif'
+        ctx.textAlign = 'center'
+        points.forEach((p, i) => ctx.fillText(label[i], p.x, h - padding + 14))
         if (progress < 1) requestAnimationFrame(bars)
       }
       bars()

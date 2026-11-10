@@ -216,6 +216,42 @@
 
   // 여기부터 작성하세요.
 
+  // STEP 7 - 주석 블록 안에 있어서 실행되지 않던 코드를 여기로 꺼냈습니다.
+  //          ctx / w / h / rad 는 위에 이미 선언되어 있으니 다시 선언하지 않습니다.
+  //          (다시 선언하면 Identifier 'ctx' has already been declared 로 멈춥니다)
+
+  let state = ''
+
+  // 불 하나. 켜져 있으면 제 색, 꺼져 있으면 어두운 회색
+  function light(y, c, on) {
+    ctx.beginPath()
+    ctx.fillStyle = on ? c : '#333'
+    ctx.arc(w / 2, h / 2 - y, 30, 0, rad(360))
+    ctx.fill()
+  }
+
+  // canvas 는 그린 것을 고칠 수 없다. 전부 지우고 처음부터 다시 그린다
+  const render = () => {
+    ctx.clearRect(0, 0, w, h)
+    ctx.fillStyle = '#888'
+    ctx.fillRect(w / 2 - 45, h / 2 - 115, 90, 230)
+    light(70, 'red', state === 'red')
+    light(0, 'yellow', state === 'yellow')
+    light(-70, 'green', state === 'green')
+    ctx.fillStyle = 'white'
+    ctx.font = '16px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('신호등', w / 2, h / 2 + 145)
+  }
+
+  // 등록은 함수 밖에서 한 번만
+  red.onclick = () => { state = 'red'; render() }
+  yellow.onclick = () => { state = 'yellow'; render() }
+  green.onclick = () => { state = 'green'; render() }
+  off.onclick = () => { state = ''; render() }
+
+  render()
+
 
 </script>
 
